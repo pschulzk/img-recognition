@@ -32,7 +32,6 @@ export class AppComponent {
       this.dataRows.push(data)
       this.cd.detectChanges()
     })
-    this.streamingService.startStream()
   }
 
   identify(index: number, item: MyStreamData) {
