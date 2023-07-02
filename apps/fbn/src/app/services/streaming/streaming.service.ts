@@ -41,7 +41,7 @@ export function parseJSON() {
 @Injectable()
 export class StreamingService {
 
-  maxResults = 300
+  maxResults = 1000
   private currentResults = 0
   
   get dataStream(): Observable<MyStreamData | null> {
@@ -75,7 +75,7 @@ export class StreamingService {
       e => console.error('The stream became errored and cannot be read from!', e)
     )
   }
-  
+
   /**
   * Get the streaming data
   */
