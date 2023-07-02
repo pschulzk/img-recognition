@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
-import { NxWelcomeComponent } from './nx-welcome.component';
+import { Component } from '@angular/core'
+import { MatButtonModule } from '@angular/material/button'
+import { MatIconModule } from '@angular/material/icon'
+import { MatToolbarModule } from '@angular/material/toolbar'
 
 @Component({
   standalone: true,
-  imports: [NxWelcomeComponent],
+  imports: [MatIconModule, MatToolbarModule, MatButtonModule],
   selector: 'fbn-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'fbn';
+  title = 'fbn'
 }

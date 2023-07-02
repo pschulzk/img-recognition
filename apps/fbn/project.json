@@ -8,18 +8,24 @@
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/fbn",
         "index": "apps/fbn/src/index.html",
         "main": "apps/fbn/src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": [
+          "zone.js"
+        ],
         "tsConfig": "apps/fbn/tsconfig.app.json",
         "assets": [
           "apps/fbn/src/favicon.ico",
           "apps/fbn/src/assets"
         ],
-        "styles": ["apps/fbn/src/styles.scss"],
+        "styles": [
+          "apps/fbn/src/styles.scss"
+        ],
         "scripts": []
       },
       "configurations": {
@@ -69,7 +75,9 @@
     },
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
         "lintFilePatterns": [
           "apps/fbn/**/*.ts",
@@ -79,7 +87,9 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
       "options": {
         "jestConfig": "apps/fbn/jest.config.ts",
         "passWithNoTests": true
