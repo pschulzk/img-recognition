@@ -32,7 +32,7 @@ Run backend app:
 $ npm run serve-be
 ```
 
-In another CLI instance, run backend app:
+In another CLI instance, run frontend app:
 ```
 $ npm run serve-fe
 ```
