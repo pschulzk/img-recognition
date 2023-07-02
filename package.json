@@ -9,7 +9,8 @@
   "scripts": {
     "ng": "nx",
     "nx": "nx",
-    "start": "nx serve --configuration development --project",
+    "serve-be": "nx serve --configuration development --project fbn-be",
+    "serve-fe": "nx serve --configuration development --proxy-config proxy.config.json --project fbn",
     "build": "nx build --prod --project",
     "test": "nx test --watch=false --project",
     "test:watch": "nx test --watch=true --project"
@@ -29,6 +30,7 @@
     "@nestjs/common": "^10.0.2",
     "@nestjs/core": "^10.0.2",
     "@nestjs/platform-express": "^10.0.2",
+    "@ngneat/until-destroy": "^10.0.0-beta.0",
     "@nx/angular": "16.4.0",
     "axios": "^1.0.0",
     "reflect-metadata": "^0.1.13",
