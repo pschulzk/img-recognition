@@ -14,13 +14,13 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h1')?.textContent).toContain(
-      'Welcome img-recognition'
+      'Welcome fbn'
     );
   });
 
-  it(`should have as title 'img-recognition'`, () => {
+  it(`should have as title 'fbn'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('img-recognition');
+    expect(app.title).toEqual('fbn');
   });
 });

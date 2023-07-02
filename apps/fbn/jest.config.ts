@@ -1,9 +1,9 @@
 /* eslint-disable */
 export default {
-  displayName: 'img-recognition',
+  displayName: 'fbn',
   preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../coverage/apps/img-recognition',
+  coverageDirectory: '../../coverage/apps/fbn',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',
