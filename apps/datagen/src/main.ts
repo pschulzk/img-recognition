@@ -1,22 +1,10 @@
 import fs from 'fs'
+import { FrameMetaData } from '@fbn/fbn-streaming'
 
 console.log('Hello World')
 
+const PATH_OUTPUT = 'apps/fbn-be/src/assets/test.ndjson'
 const nb_frames = 298
-
-export interface FrameMetaData {
-    frameNumber: number
-    visualData: FrameVisualData
-}
-
-export interface FrameVisualData {
-    objects: ObjectData[]
-}
-
-export interface ObjectData {
-    x: number
-    y: number
-}
 
 const DATA: FrameMetaData[] = []
 
@@ -35,7 +23,7 @@ for (let i = 0; i < nb_frames; i++) {
 }
 
 fs.writeFile(
-  'dist/test.json',
+  PATH_OUTPUT,
   JSON.stringify(DATA, null, 2),
   err => {
     if (err) {

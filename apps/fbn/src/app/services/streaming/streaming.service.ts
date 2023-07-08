@@ -1,11 +1,6 @@
 import { Injectable } from '@angular/core'
+import { FrameMetaData } from '@fbn/fbn-streaming'
 import { BehaviorSubject, Observable } from 'rxjs'
-
-export interface MyStreamData {
-  id: number
-  result: string
-  phone: number
-}
 
 /**
 * Split the stream
@@ -30,7 +25,7 @@ export function splitStream(splitOn: string) {
 /**
 * Parse the NDJSON results
 */
-export function parseJSON() {
+export function parseJson() {
   return new TransformStream({
     transform(chunk, controller) {
       controller.enqueue(JSON.parse(chunk))
@@ -44,31 +39,31 @@ export class StreamingService {
   maxResults = 1000
   private currentResults = 0
   
-  get dataStream(): Observable<MyStreamData | null> {
-    return this._dataStream.asObservable()
+  get frameDataStream(): Observable<FrameMetaData | null> {
+    return this._frameDataStream.asObservable()
   }
 
-  private _dataStream = new BehaviorSubject<MyStreamData | null>(null)
+  private _frameDataStream = new BehaviorSubject<FrameMetaData | null>(null)
 
-  async startStream(): Promise<void> {
+  async startFrameDataStream(): Promise<void> {
     this.currentResults = 0
-    const _reader = await this.getReader()
-    this.readNext(_reader)
+    const _reader = await this.getNdjsonReader()
+    this.readNextFrameData(_reader)
   }
 
-  private readNext(reader: ReadableStreamDefaultReader<MyStreamData>) {
+  private readNextFrameData(reader: ReadableStreamDefaultReader<FrameMetaData>) {
     reader.read().then(
       ({ value, done }) => {
         if (done) {
           console.log('The stream was already closed!')
 
         } else {
-          this._dataStream.next(value)
+          this._frameDataStream.next(value)
           this.currentResults++
 
           // Recursively call
           if (this.currentResults <= this.maxResults) {
-            this.readNext(reader)
+            this.readNextFrameData(reader)
           }
         }
       },
@@ -79,9 +74,9 @@ export class StreamingService {
   /**
   * Get the streaming data
   */
-  private async getReader(): Promise<ReadableStreamDefaultReader<MyStreamData>> {
+  private async getNdjsonReader(): Promise<ReadableStreamDefaultReader<FrameMetaData>> {
     // Retrieve NDJSON from the server
-    const response = await fetch('/api/file')
+    const response = await fetch('/api/meta-data')
     
     let results
     if (response.body) {
@@ -91,7 +86,7 @@ export class StreamingService {
         // Buffer until newlines:
         .pipeThrough(splitStream('\n'))
         // Parse chunks as JSON:
-        .pipeThrough(parseJSON())
+        .pipeThrough(parseJson())
     } else {
       throw new Error('No response body')
     }

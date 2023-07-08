@@ -15,7 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "resolveJsonModule": true,
-    "paths": {}
+    "paths": {
+      "@fbn/fbn-streaming": ["libs/fbn-streaming/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

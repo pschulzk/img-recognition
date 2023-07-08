@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { MatToolbarModule } from '@angular/material/toolbar'
+import { FrameMetaData } from '@fbn/fbn-streaming'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
-import { MyStreamData, StreamingService } from './services/streaming/streaming.service'
+import { StreamingService } from './services/streaming/streaming.service'
 
 @UntilDestroy()
 @Component({
@@ -16,7 +17,8 @@ import { MyStreamData, StreamingService } from './services/streaming/streaming.s
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  dataRows: MyStreamData[] = []
+  videoFrameDataRows: FrameMetaData[] = []
+  @ViewChild('video', {static: true}) video?: ElementRef<HTMLVideoElement>
 
   constructor(
     private streamingService: StreamingService,
@@ -26,20 +28,47 @@ export class AppComponent {
   }
 
   ngOnInit(): void {
-    this.streamingService.dataStream.pipe(untilDestroyed(this)).subscribe((data) => {
+    this.streamingService.frameDataStream.pipe(untilDestroyed(this)).subscribe((data) => {
       // console.log('data', data)
       if (!data) return
-      this.dataRows.push(data)
+      this.videoFrameDataRows.push(data)
       this.cd.detectChanges()
     })
   }
 
-  identify(index: number, item: MyStreamData) {
-    return item.id
+  async onStart(){
+    // const ms: MediaStream = await this.streamingService.frameDataStream.
+    // const _video = this.video.nativeElement
+    // _video.srcObject = ms
+    // _video.play() 
+  }
+
+  onStop() {
+    if (!this.video) {
+      return
+    }
+    this.video.nativeElement.pause();
+    (this.video.nativeElement.srcObject as MediaStream).getVideoTracks()[0].stop()
+    this.video.nativeElement.srcObject = null
+  }
+
+  ngOnDestroy() {
+    const mediaStream: MediaStream = this.video?.nativeElement.srcObject as MediaStream
+    if (!mediaStream) {
+      return
+    }
+    const videoTrack = mediaStream.getVideoTracks()
+    if (videoTrack.length) {
+      videoTrack[0].stop()
+    }
+  }
+
+  identify(index: number) {
+    return index
   }
 
   startStream(): void {
-    this.dataRows = []
-    this.streamingService.startStream()
+    this.videoFrameDataRows = []
+    this.streamingService.startFrameDataStream()
   }
 }
