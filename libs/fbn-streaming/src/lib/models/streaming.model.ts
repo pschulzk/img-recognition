@@ -10,4 +10,5 @@ export interface FrameVisualData {
 export interface ObjectData {
   x: number
   y: number
+  label?: string
 }

@@ -27,7 +27,7 @@ async function bootstrap() {
 
   const options = new DocumentBuilder()
     .setTitle('NestJS Fastify Streaming Server')
-    // .setDescription('Stream files to and from a MongoDB.')
+    .setDescription('Video Stream Meta Data Visualization')
     .setVersion(version)
     .addTag('File')
     .build()

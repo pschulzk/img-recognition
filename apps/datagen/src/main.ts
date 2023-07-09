@@ -27,6 +27,12 @@ stream.once('open', () => {
           {
             x: i,
             y: i,
+            label: 'test 1',
+          },
+          {
+            x: i + 25,
+            y: i + 25,
+            label: 'test 2',
           },
         ],
       },

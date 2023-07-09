@@ -11,3 +11,16 @@
   color: rgba(55, 65, 81, 1);
   width: 100%;
 }
+
+.object-frame {
+  background-color: transparent;
+  position: absolute;
+  width: 2rem;
+  height: 1.5rem;
+  border-width: 2px;
+  border-color: blue;
+}
+
+.object-label {
+  
+}

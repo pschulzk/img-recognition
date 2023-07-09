@@ -3,9 +3,11 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { MatToolbarModule } from '@angular/material/toolbar'
-import { FrameMetaData } from '@fbn/fbn-streaming'
+import { FrameMetaData, ObjectData, tapOnce } from '@fbn/fbn-streaming'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
 import { StreamingService } from './services/streaming/streaming.service'
+import { uuid } from 'uuidv4'
+import { Subscription } from 'rxjs'
 
 // // this implementation is for eventual cross-browser support
 // export async function onFrameChange(vid: HTMLVideoElement) {
@@ -47,6 +49,18 @@ import { StreamingService } from './services/streaming/streaming.service'
 //   }
 // }
 
+export interface VisualizationState {
+  frameNumber: number
+  objects: VisualObjectData[]
+}
+
+export interface VisualObjectData {
+  id: string
+  x: number
+  y: number
+  color: string
+}
+
 @UntilDestroy()
 @Component({
   standalone: true,
@@ -57,8 +71,14 @@ import { StreamingService } from './services/streaming/streaming.service'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit, AfterViewInit {
-  videoFrameMetaDataRows: FrameMetaData[] = []
+  frameMetaDataRows: FrameMetaData[] = []
+  currentVisualizationState: VisualizationState = {
+    frameNumber: 0,
+    objects: []
+  }
   @ViewChild('video', { static: false }) video?: ElementRef<HTMLVideoElement>
+
+  private metaDataStreamSub$?: Subscription
 
   constructor(
     private streamingService: StreamingService,
@@ -66,28 +86,29 @@ export class AppComponent implements OnInit, AfterViewInit {
   ) { }
 
   ngOnInit(): void {
-    this.streamingService.frameDataStream.pipe(untilDestroyed(this)).subscribe((data) => {
-      if (!data) return
-      this.videoFrameMetaDataRows.push(data)
-      this.cd.detectChanges()
-    })
+
   }
 
   ngAfterViewInit(): void {
-    if (this.video) {
-      const video: HTMLVideoElement = this.video.nativeElement
-      video.play()
-      video.requestVideoFrameCallback((time, frameMetadata) => this.drawingLoop(time, frameMetadata, video))
-    }
-  }
+    this.metaDataStreamSub$ = this.streamingService.metaDataStream.pipe(
+      untilDestroyed(this),
+    ).subscribe((data) => {
+      if (!data) return
+      this.frameMetaDataRows.push(data)
+      // console.log('!!! this.frameMetaDataRows', this.frameMetaDataRows)
+      // start afte rfirst frame has been received
+      if (this.frameMetaDataRows.length === 1) {
+        this.startVideoStream()
+      }
 
-  drawingLoop(time: DOMHighResTimeStamp, frameMetadata: VideoFrameCallbackMetadata, vid: HTMLVideoElement) {
-    console.log(`timestamp: ${ time }
-    frame: ${ JSON.stringify( frameMetadata, null, 4 ) }`)
-    vid.requestVideoFrameCallback((time, metadata) => this.drawingLoop(time, metadata, vid))
+      this.cd.detectChanges()
+    })
+
+    this.startMetaDataStream()
   }
 
   ngOnDestroy() {
+    // try stopping the player to close any streams
     const mediaStream: MediaStream = this.video?.nativeElement.srcObject as MediaStream
     if (!mediaStream) {
       return
@@ -102,8 +123,55 @@ export class AppComponent implements OnInit, AfterViewInit {
     return index
   }
 
-  startStream(): void {
-    this.videoFrameMetaDataRows = []
-    this.streamingService.startFrameDataStream()
+  startMetaDataStream(): void {
+    this.frameMetaDataRows = []
+    if (this.video) {
+      const video: HTMLVideoElement = this.video.nativeElement
+      video.pause()
+      video.currentTime = 0
+      this.streamingService.startMetaDataStream()
+    }
   }
+
+  startVideoStream(): void {
+    if (this.video) {
+      console.log('!!! startVideoStream', this.video)
+      const video: HTMLVideoElement = this.video.nativeElement
+      video.muted = true
+      video.play()
+      video.requestVideoFrameCallback((timestamp, videoFrameCallbackMetadata) => this.videoFrameCallback(timestamp, videoFrameCallbackMetadata, video))
+    }
+  }
+
+  videoFrameCallback(timestamp: DOMHighResTimeStamp, videoFrameCallbackMetadata: VideoFrameCallbackMetadata, vid: HTMLVideoElement) {
+    // console.log(`timestamp: ${ timestamp } | frame: ${ JSON.stringify( videoFrameCallbackMetadata, null, 4 ) }`)
+
+    // update state
+    const currentFrameNumber = videoFrameCallbackMetadata.presentedFrames
+    if (this.frameMetaDataRows[currentFrameNumber - 1]) {
+      const frameMetaData: FrameMetaData = this.frameMetaDataRows[currentFrameNumber - 1]
+      // check if the correct frame number
+      if (frameMetaData.frameNumber === currentFrameNumber) {
+        // update visualization state
+        this.currentVisualizationState = this.updateVisualizationState(videoFrameCallbackMetadata, frameMetaData)
+      }
+    }
+    // recursive function call
+    vid.requestVideoFrameCallback((timestamp, metadata) => this.videoFrameCallback(timestamp, metadata, vid))
+  }
+
+  updateVisualizationState(videoFrameCallbackMetadata: VideoFrameCallbackMetadata, frameMetaData: FrameMetaData): VisualizationState {
+    const frameNumber = videoFrameCallbackMetadata.presentedFrames
+    const newState: VisualizationState = {
+      frameNumber,
+      objects: frameMetaData.visualData.objects.map((o: ObjectData) => ({
+        id: '000',
+        x: o.x,
+        y: o.y,
+        color: 'teal'
+      }))
+    }
+    return newState
+  }
+
 }

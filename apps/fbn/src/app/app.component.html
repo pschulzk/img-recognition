@@ -14,20 +14,39 @@
 <div class="wrapper">
   <div class="container">
     <br>
-    <video #video width="100%" controls>
-      <source src="http://localhost:3000/video/testvideo-001.mp4" type="video/mp4">
-    </video>
+    <div id="video-container">
+      <div id="video-overlay">
+        <ng-container
+          *ngFor="let objectData of currentVisualizationState.objects"
+          [ngTemplateOutlet]="objectTemplate"
+          [ngTemplateOutletContext]="{
+            objectData,
+          }"
+        ></ng-container>
+      </div>
+      <video #video width="100%" controls>
+        <source src="http://localhost:3000/video/testvideo-001.mp4" type="video/mp4">
+      </video>
+    </div>
     <br>
     <button
       mat-raised-button
       color="primary"
       aria-label="Redo"
-      (click)="startStream()"
+      (click)="startMetaDataStream()"
     >
     <mat-icon>refresh</mat-icon>
     Reload Data
-  </button>
-  <pre>Total amount of data rows: {{ videoFrameMetaDataRows.length | json }}</pre>
-  <pre *ngFor="let data of videoFrameMetaDataRows; trackBy:identify">{{ data | json }}</pre>
+    </button>
+    <pre>Total amount of data rows: {{ frameMetaDataRows.length | json }}</pre>
+    <pre *ngFor="let data of frameMetaDataRows; trackBy:identify">{{ data | json }}</pre>
+  </div>
 </div>
-</div>
+
+<ng-template #objectTemplate let-objectData="objectData">
+  <div class="object-frame" [ngStyle]="{ 'border-color': objectData.color }">
+    <div class="object-label" [ngStyle]="{ 'background-color': objectData.color }">
+      {{ objectData.label }}
+    </div>
+  </div>
+</ng-template>

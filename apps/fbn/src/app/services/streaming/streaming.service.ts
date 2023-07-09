@@ -36,16 +36,16 @@ export function parseJson() {
 @Injectable()
 export class StreamingService {
 
-  maxResults = 1000
+  maxResults = 10000
   private currentResults = 0
   
-  get frameDataStream(): Observable<FrameMetaData | null> {
-    return this._frameDataStream.asObservable()
+  get metaDataStream(): Observable<FrameMetaData | null> {
+    return this._metaDataStream.asObservable()
   }
 
-  private _frameDataStream = new BehaviorSubject<FrameMetaData | null>(null)
+  private _metaDataStream = new BehaviorSubject<FrameMetaData | null>(null)
 
-  async startFrameDataStream(): Promise<void> {
+  async startMetaDataStream(): Promise<void> {
     this.currentResults = 0
     const _reader = await this.getNdjsonReader()
     this.readNextFrameData(_reader)
@@ -58,7 +58,7 @@ export class StreamingService {
           console.log('The stream was already closed!')
 
         } else {
-          this._frameDataStream.next(value)
+          this._metaDataStream.next(value)
           this.currentResults++
 
           // Recursively call
