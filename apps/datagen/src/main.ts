@@ -30,8 +30,8 @@ stream.once('open', () => {
             label: 'test 1',
           },
           {
-            x: i + 25,
-            y: i + 25,
+            x: nb_frames - i,
+            y: nb_frames - i,
             label: 'test 2',
           },
         ],

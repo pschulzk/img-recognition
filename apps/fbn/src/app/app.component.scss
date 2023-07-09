@@ -12,13 +12,25 @@
   width: 100%;
 }
 
+#video-container {
+  position: relative;
+}
+
+#video-overlay {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: calc(100% - 5rem);
+}
+
 .object-frame {
   background-color: transparent;
   position: absolute;
-  width: 2rem;
-  height: 1.5rem;
-  border-width: 2px;
-  border-color: blue;
+  width: 8rem;
+  height: 6rem;
+  border: 0.2rem solid blue;
 }
 
 .object-label {

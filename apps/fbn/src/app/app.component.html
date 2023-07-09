@@ -15,6 +15,10 @@
   <div class="container">
     <br>
     <div id="video-container">
+      <video #video width="100%" controls>
+        <!-- <source src="https://samplelib.com/lib/preview/mp4/sample-5s.mp4" type="video/mp4"> -->
+        <source src="http://localhost:3000/video/testvideo-001.mp4" type="video/mp4">
+      </video>
       <div id="video-overlay">
         <ng-container
           *ngFor="let objectData of currentVisualizationState.objects"
@@ -24,9 +28,6 @@
           }"
         ></ng-container>
       </div>
-      <video #video width="100%" controls>
-        <source src="http://localhost:3000/video/testvideo-001.mp4" type="video/mp4">
-      </video>
     </div>
     <br>
     <button
@@ -44,7 +45,13 @@
 </div>
 
 <ng-template #objectTemplate let-objectData="objectData">
-  <div class="object-frame" [ngStyle]="{ 'border-color': objectData.color }">
+  <div
+    class="object-frame"
+    [style.left.px]="objectData.x"
+    [style.bottom.px]="objectData.y"
+    [style.border-color]="objectData.color"
+    [title]="objectData | json"
+  >
     <div class="object-label" [ngStyle]="{ 'background-color': objectData.color }">
       {{ objectData.label }}
     </div>

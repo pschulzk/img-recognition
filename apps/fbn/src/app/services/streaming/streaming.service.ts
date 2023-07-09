@@ -51,8 +51,8 @@ export class StreamingService {
     this.readNextFrameData(_reader)
   }
 
-  private readNextFrameData(reader: ReadableStreamDefaultReader<FrameMetaData>) {
-    reader.read().then(
+  private async readNextFrameData(reader: ReadableStreamDefaultReader<FrameMetaData>): Promise<void> {
+    return reader.read().then(
       ({ value, done }) => {
         if (done) {
           console.log('The stream was already closed!')

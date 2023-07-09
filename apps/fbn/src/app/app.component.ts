@@ -1,13 +1,11 @@
 import { CommonModule } from '@angular/common'
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core'
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { MatToolbarModule } from '@angular/material/toolbar'
-import { FrameMetaData, ObjectData, tapOnce } from '@fbn/fbn-streaming'
+import { FrameMetaData, ObjectData } from '@fbn/fbn-streaming'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
 import { StreamingService } from './services/streaming/streaming.service'
-import { uuid } from 'uuidv4'
-import { Subscription } from 'rxjs'
 
 // // this implementation is for eventual cross-browser support
 // export async function onFrameChange(vid: HTMLVideoElement) {
@@ -70,7 +68,8 @@ export interface VisualObjectData {
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnInit, AfterViewInit {
+export class AppComponent implements AfterViewInit {
+  frameRate = 30
   frameMetaDataRows: FrameMetaData[] = []
   currentVisualizationState: VisualizationState = {
     frameNumber: 0,
@@ -78,30 +77,21 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
   @ViewChild('video', { static: false }) video?: ElementRef<HTMLVideoElement>
 
-  private metaDataStreamSub$?: Subscription
-
   constructor(
     private streamingService: StreamingService,
     private cd: ChangeDetectorRef,
   ) { }
 
-  ngOnInit(): void {
-
-  }
-
   ngAfterViewInit(): void {
-    this.metaDataStreamSub$ = this.streamingService.metaDataStream.pipe(
+    this.streamingService.metaDataStream.pipe(
       untilDestroyed(this),
     ).subscribe((data) => {
       if (!data) return
       this.frameMetaDataRows.push(data)
-      // console.log('!!! this.frameMetaDataRows', this.frameMetaDataRows)
-      // start afte rfirst frame has been received
+      // start after first frame has been received
       if (this.frameMetaDataRows.length === 1) {
         this.startVideoStream()
       }
-
-      this.cd.detectChanges()
     })
 
     this.startMetaDataStream()
@@ -128,14 +118,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (this.video) {
       const video: HTMLVideoElement = this.video.nativeElement
       video.pause()
-      video.currentTime = 0
+      video.load()
       this.streamingService.startMetaDataStream()
     }
   }
 
   startVideoStream(): void {
     if (this.video) {
-      console.log('!!! startVideoStream', this.video)
       const video: HTMLVideoElement = this.video.nativeElement
       video.muted = true
       video.play()
@@ -147,13 +136,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     // console.log(`timestamp: ${ timestamp } | frame: ${ JSON.stringify( videoFrameCallbackMetadata, null, 4 ) }`)
 
     // update state
-    const currentFrameNumber = videoFrameCallbackMetadata.presentedFrames
-    if (this.frameMetaDataRows[currentFrameNumber - 1]) {
-      const frameMetaData: FrameMetaData = this.frameMetaDataRows[currentFrameNumber - 1]
+    const currentFrameNumber = Math.round(videoFrameCallbackMetadata.mediaTime * this.frameRate)
+    if (this.frameMetaDataRows[currentFrameNumber]) {
+      const frameMetaData: FrameMetaData = this.frameMetaDataRows[currentFrameNumber]
       // check if the correct frame number
-      if (frameMetaData.frameNumber === currentFrameNumber) {
+      if (frameMetaData.frameNumber === currentFrameNumber + 1) {
         // update visualization state
         this.currentVisualizationState = this.updateVisualizationState(videoFrameCallbackMetadata, frameMetaData)
+        this.cd.detectChanges()
       }
     }
     // recursive function call
@@ -164,11 +154,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     const frameNumber = videoFrameCallbackMetadata.presentedFrames
     const newState: VisualizationState = {
       frameNumber,
-      objects: frameMetaData.visualData.objects.map((o: ObjectData) => ({
+      objects: frameMetaData.visualData.objects.map((o: ObjectData, index: number) => ({
         id: '000',
         x: o.x,
         y: o.y,
-        color: 'teal'
+        color: index ? 'teal' : 'yellow',
       }))
     }
     return newState
