@@ -131,3 +131,6 @@ dist
 
 # Angular
 .angular
+
+# OS
+.DS_Store

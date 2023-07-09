@@ -6,25 +6,9 @@ console.log('Hello World')
 const PATH_OUTPUT = 'apps/fbn-be/src/assets/test.ndjson'
 const nb_frames = 298
 
-const DATA: FrameMetaData[] = []
-
-for (let i = 0; i < nb_frames; i++) {
-  DATA.push({
-    frameNumber: i + 1,
-    visualData: {
-      objects: [
-        {
-          x: i,
-          y: i,
-        },
-      ],
-    },
-  })
-}
-
 fs.writeFile(
   PATH_OUTPUT,
-  JSON.stringify(DATA, null, 2),
+  '',
   err => {
     if (err) {
       console.error(err)
@@ -32,3 +16,21 @@ fs.writeFile(
     console.log('File written successfully!')
   }
 )
+
+const stream = fs.createWriteStream(PATH_OUTPUT, { flags: 'a' })
+stream.once('open', () => {
+  for (let i = 0; i < nb_frames; i++) {
+    const frameMetaDataRow: FrameMetaData = {
+      frameNumber: i + 1,
+      visualData: {
+        objects: [
+          {
+            x: i,
+            y: i,
+          },
+        ],
+      },
+    }
+    stream.write(JSON.stringify(frameMetaDataRow) + '\r\n')
+  }
+})

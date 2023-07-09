@@ -13,7 +13,11 @@
 </mat-toolbar>
 <div class="wrapper">
   <div class="container">
-    <h1>Image Recognition</h1>
+    <br>
+    <video #video width="100%" controls>
+      <source src="http://localhost:3000/video/testvideo-001.mp4" type="video/mp4">
+    </video>
+    <br>
     <button
       mat-raised-button
       color="primary"
@@ -23,7 +27,7 @@
     <mat-icon>refresh</mat-icon>
     Reload Data
   </button>
-  <pre>Total amount of data rows: {{ dataRows.length | json }}</pre>
-  <pre *ngFor="let data of dataRows; trackBy:identify">{{ data | json }}</pre>
+  <pre>Total amount of data rows: {{ videoFrameMetaDataRows.length | json }}</pre>
+  <pre *ngFor="let data of videoFrameMetaDataRows; trackBy:identify">{{ data | json }}</pre>
 </div>
 </div>
