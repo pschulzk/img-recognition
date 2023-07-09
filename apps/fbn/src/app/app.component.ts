@@ -156,8 +156,8 @@ export class AppComponent implements AfterViewInit {
       frameNumber,
       objects: frameMetaData.visualData.objects.map((o: ObjectData, index: number) => ({
         id: '000',
-        x: o.x,
-        y: o.y,
+        x:  o.x <= videoFrameCallbackMetadata.width ? o.x : videoFrameCallbackMetadata.width,
+        y: o.y <= videoFrameCallbackMetadata.height ? o.y : videoFrameCallbackMetadata.height,
         color: index ? 'teal' : 'yellow',
       }))
     }
