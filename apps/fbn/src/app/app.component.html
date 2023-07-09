@@ -49,10 +49,12 @@
     [style.left.px]="objectData.x"
     [style.bottom.px]="objectData.y"
     [style.border-color]="objectData.color"
-    [title]="objectData | json"
   >
-    <div class="object-label" [ngStyle]="{ 'background-color': objectData.color }">
+    <div class="object-label" [style.background-color]="objectData.color">
       {{ objectData.label }}
+    </div>
+    <div class="object-data" [style.background-color]="objectData.color">
+      {{ objectData | json }}
     </div>
   </div>
 </ng-template>
