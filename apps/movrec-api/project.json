@@ -1,7 +1,7 @@
 {
-  "name": "fbn-api",
+  "name": "movrec-api",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/fbn-api/src",
+  "sourceRoot": "apps/movrec-api/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -11,12 +11,12 @@
       "options": {
         "target": "node",
         "compiler": "tsc",
-        "outputPath": "dist/apps/fbn-api",
-        "main": "apps/fbn-api/src/main.ts",
-        "tsConfig": "apps/fbn-api/tsconfig.app.json",
-        "assets": ["apps/fbn-api/src/assets"],
+        "outputPath": "dist/apps/movrec-api",
+        "main": "apps/movrec-api/src/main.ts",
+        "tsConfig": "apps/movrec-api/tsconfig.app.json",
+        "assets": ["apps/movrec-api/src/assets"],
         "isolatedConfig": true,
-        "webpackConfig": "apps/fbn-api/webpack.config.js"
+        "webpackConfig": "apps/movrec-api/webpack.config.js"
       },
       "configurations": {
         "development": {},
@@ -27,14 +27,14 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "fbn-api:build"
+        "buildTarget": "movrec-api:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "fbn-api:build:development"
+          "buildTarget": "movrec-api:build:development"
         },
         "production": {
-          "buildTarget": "fbn-api:build:production"
+          "buildTarget": "movrec-api:build:production"
         }
       }
     },
@@ -42,14 +42,14 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/fbn-api/**/*.ts"]
+        "lintFilePatterns": ["apps/movrec-api/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/fbn-api/jest.config.ts",
+        "jestConfig": "apps/movrec-api/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {

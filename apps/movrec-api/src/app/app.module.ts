@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common'
 
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { MetaDataController } from './file/file.controller'
+import { MetaDataController } from './file/metadata.controller'
 
 @Module({
   imports: [],

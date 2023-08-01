@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'fbn-ui',
+  displayName: 'movrec-ui',
   preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   transform: {

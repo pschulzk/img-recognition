@@ -1,22 +1,22 @@
 {
-  "name": "fbn-ui-e2e",
+  "name": "movrec-ui-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/fbn-ui-e2e/src",
+  "sourceRoot": "apps/movrec-ui-e2e/src",
   "projectType": "application",
   "targets": {
     "e2e": {
       "executor": "@nx/cypress:cypress",
       "options": {
-        "cypressConfig": "apps/fbn-ui-e2e/cypress.config.ts",
-        "devServerTarget": "fbn-ui:serve:development",
+        "cypressConfig": "apps/movrec-ui-e2e/cypress.config.ts",
+        "devServerTarget": "movrec-ui:serve:development",
         "testingType": "e2e"
       },
       "configurations": {
         "production": {
-          "devServerTarget": "fbn-ui:serve:production"
+          "devServerTarget": "movrec-ui:serve:production"
         },
         "ci": {
-          "devServerTarget": "fbn-ui:serve-static"
+          "devServerTarget": "movrec-ui:serve-static"
         }
       }
     },
@@ -24,10 +24,10 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/fbn-ui-e2e/**/*.{js,ts}"]
+        "lintFilePatterns": ["apps/movrec-ui-e2e/**/*.{js,ts}"]
       }
     }
   },
   "tags": [],
-  "implicitDependencies": ["fbn-ui"]
+  "implicitDependencies": ["movrec-ui"]
 }
