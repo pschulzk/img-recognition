@@ -7,7 +7,7 @@ import { join } from 'node:path'
 export class MetaDataController {
   @Get()
   getFile(@Res() res: Response) {
-    const file = createReadStream(join(process.cwd(), 'apps/fbn-be/src/assets/test.ndjson'))
+    const file = createReadStream(join(process.cwd(), 'apps/fbn-api/src/assets/test.ndjson'))
     res.send(file)
   }
 }
@@ -16,7 +16,7 @@ export class MetaDataController {
 // export class VideoController {
 //   @Get()
 //   getFile(@Res() res: Response) {
-//     const file = createReadStream(join(process.cwd(), 'apps/fbn-be/src/assets/testvideo-001.mp4'))
+//     const file = createReadStream(join(process.cwd(), 'apps/fbn-api/src/assets/testvideo-001.mp4'))
 //     res.send(file)
 //   }
 // }

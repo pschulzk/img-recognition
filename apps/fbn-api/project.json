@@ -1,7 +1,7 @@
 {
-  "name": "fbn-be",
+  "name": "fbn-api",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/fbn-be/src",
+  "sourceRoot": "apps/fbn-api/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -11,12 +11,12 @@
       "options": {
         "target": "node",
         "compiler": "tsc",
-        "outputPath": "dist/apps/fbn-be",
-        "main": "apps/fbn-be/src/main.ts",
-        "tsConfig": "apps/fbn-be/tsconfig.app.json",
-        "assets": ["apps/fbn-be/src/assets"],
+        "outputPath": "dist/apps/fbn-api",
+        "main": "apps/fbn-api/src/main.ts",
+        "tsConfig": "apps/fbn-api/tsconfig.app.json",
+        "assets": ["apps/fbn-api/src/assets"],
         "isolatedConfig": true,
-        "webpackConfig": "apps/fbn-be/webpack.config.js"
+        "webpackConfig": "apps/fbn-api/webpack.config.js"
       },
       "configurations": {
         "development": {},
@@ -27,14 +27,14 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "fbn-be:build"
+        "buildTarget": "fbn-api:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "fbn-be:build:development"
+          "buildTarget": "fbn-api:build:development"
         },
         "production": {
-          "buildTarget": "fbn-be:build:production"
+          "buildTarget": "fbn-api:build:production"
         }
       }
     },
@@ -42,14 +42,14 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/fbn-be/**/*.ts"]
+        "lintFilePatterns": ["apps/fbn-api/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/fbn-be/jest.config.ts",
+        "jestConfig": "apps/fbn-api/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {

@@ -10,8 +10,8 @@
     "ng": "nx",
     "nx": "nx",
     "serve-datagen": "nx serve --configuration development --project datagen",
-    "serve-be": "nx serve --configuration development --project fbn-be",
-    "serve-fe": "nx serve --configuration development --proxy-config proxy.config.json --project fbn",
+    "serve-api": "nx serve --configuration development --project fbn-api",
+    "serve-ui": "nx serve --configuration development --proxy-config proxy.config.json --project fbn-ui",
     "build": "nx build --prod --project",
     "test": "nx test --watch=false --project",
     "test:watch": "nx test --watch=true --project"

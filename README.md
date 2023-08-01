@@ -29,10 +29,10 @@ $ npm ci
 
 Run backend app:
 ```
-$ npm run serve-be
+$ npm run serve-api
 ```
 
 In another CLI instance, run frontend app:
 ```
-$ npm run serve-fe
+$ npm run serve-ui
 ```

@@ -3,7 +3,7 @@ import { FrameMetaData } from '@fbn/fbn-streaming'
 
 console.log('Hello World')
 
-const PATH_OUTPUT = 'apps/fbn-be/src/assets/test.ndjson'
+const PATH_OUTPUT = 'apps/fbn-api/src/assets/test.ndjson'
 const nb_frames = 298
 
 fs.writeFile(

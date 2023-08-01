@@ -1,9 +1,9 @@
 {
-  "name": "fbn",
+  "name": "fbn-ui",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "prefix": "fbn",
-  "sourceRoot": "apps/fbn/src",
+  "prefix": "fbn-ui",
+  "sourceRoot": "apps/fbn-ui/src",
   "tags": [],
   "targets": {
     "build": {
@@ -12,19 +12,19 @@
         "{options.outputPath}"
       ],
       "options": {
-        "outputPath": "dist/apps/fbn",
-        "index": "apps/fbn/src/index.html",
-        "main": "apps/fbn/src/main.ts",
+        "outputPath": "dist/apps/fbn-ui",
+        "index": "apps/fbn-ui/src/index.html",
+        "main": "apps/fbn-ui/src/main.ts",
         "polyfills": [
           "zone.js"
         ],
-        "tsConfig": "apps/fbn/tsconfig.app.json",
+        "tsConfig": "apps/fbn-ui/tsconfig.app.json",
         "assets": [
-          "apps/fbn/src/favicon.ico",
-          "apps/fbn/src/assets"
+          "apps/fbn-ui/src/favicon.ico",
+          "apps/fbn-ui/src/assets"
         ],
         "styles": [
-          "apps/fbn/src/styles.scss"
+          "apps/fbn-ui/src/styles.scss"
         ],
         "scripts": []
       },
@@ -59,10 +59,10 @@
       "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
-          "browserTarget": "fbn:build:production"
+          "browserTarget": "fbn-ui:build:production"
         },
         "development": {
-          "browserTarget": "fbn:build:development"
+          "browserTarget": "fbn-ui:build:development"
         }
       },
       "defaultConfiguration": "development"
@@ -70,7 +70,7 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "browserTarget": "fbn:build"
+        "browserTarget": "fbn-ui:build"
       }
     },
     "lint": {
@@ -80,8 +80,8 @@
       ],
       "options": {
         "lintFilePatterns": [
-          "apps/fbn/**/*.ts",
-          "apps/fbn/**/*.html"
+          "apps/fbn-ui/**/*.ts",
+          "apps/fbn-ui/**/*.html"
         ]
       }
     },
@@ -91,7 +91,7 @@
         "{workspaceRoot}/coverage/{projectRoot}"
       ],
       "options": {
-        "jestConfig": "apps/fbn/jest.config.ts",
+        "jestConfig": "apps/fbn-ui/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {
@@ -104,7 +104,7 @@
     "serve-static": {
       "executor": "@nx/web:file-server",
       "options": {
-        "buildTarget": "fbn:build"
+        "buildTarget": "fbn-ui:build"
       }
     }
   }

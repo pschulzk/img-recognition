@@ -1,13 +1,13 @@
 {
-  "name": "fbn-e2e",
+  "name": "fbn-ui-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/fbn-e2e/src",
+  "sourceRoot": "apps/fbn-ui-e2e/src",
   "projectType": "application",
   "targets": {
     "e2e": {
       "executor": "@nx/cypress:cypress",
       "options": {
-        "cypressConfig": "apps/fbn-e2e/cypress.config.ts",
+        "cypressConfig": "apps/fbn-ui-e2e/cypress.config.ts",
         "devServerTarget": "fbn:serve:development",
         "testingType": "e2e"
       },
@@ -24,10 +24,10 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/fbn-e2e/**/*.{js,ts}"]
+        "lintFilePatterns": ["apps/fbn-ui-e2e/**/*.{js,ts}"]
       }
     }
   },
   "tags": [],
-  "implicitDependencies": ["fbn"]
+  "implicitDependencies": ["fbn-ui"]
 }
