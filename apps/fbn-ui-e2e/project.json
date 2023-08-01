@@ -8,15 +8,15 @@
       "executor": "@nx/cypress:cypress",
       "options": {
         "cypressConfig": "apps/fbn-ui-e2e/cypress.config.ts",
-        "devServerTarget": "fbn:serve:development",
+        "devServerTarget": "fbn-ui:serve:development",
         "testingType": "e2e"
       },
       "configurations": {
         "production": {
-          "devServerTarget": "fbn:serve:production"
+          "devServerTarget": "fbn-ui:serve:production"
         },
         "ci": {
-          "devServerTarget": "fbn:serve-static"
+          "devServerTarget": "fbn-ui:serve-static"
         }
       }
     },
