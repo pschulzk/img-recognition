@@ -12,6 +12,7 @@
     "serve-datagen": "nx serve --configuration development --project datagen",
     "serve-movrec-api": "nx serve --configuration development --project movrec-api",
     "serve-movrec-ui": "nx serve --configuration development --proxy-config proxy.config.json --project movrec-ui",
+    "serve-imgrec-ui": "nx serve --configuration development --proxy-config proxy.config.json --project imgrec-ui",
     "build": "nx build --prod --project",
     "test": "nx test --watch=false --project",
     "test:watch": "nx test --watch=true --project"

@@ -1,0 +1,58 @@
+<mat-toolbar color="primary">
+    <button mat-icon-button aria-label="Example icon-button with menu icon">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span>Image Recognition</span>
+    <span class="example-spacer"></span>
+    <!-- <button mat-icon-button aria-label="Example icon-button with heart icon">
+      <mat-icon>favorite</mat-icon>
+    </button>
+    <button mat-icon-button aria-label="Example icon-button with share icon">
+      <mat-icon>share</mat-icon>
+    </button> -->
+  </mat-toolbar>
+  <div class="wrapper">
+    <div class="container">
+      <br>
+      <div id="img-container">
+        <video #video width="100%" controls>
+          <source src="http://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+        </video>
+        <div id="img-overlay">
+          <ng-container
+            *ngFor="let objectData of visualObjects"
+            [ngTemplateOutlet]="objectTemplate"
+            [ngTemplateOutletContext]="{
+              objectData,
+            }"
+          ></ng-container>
+        </div>
+      </div>
+      <br>
+      <button
+        mat-raised-button
+        color="primary"
+        aria-label="Redo"
+      >
+      <mat-icon>refresh</mat-icon>
+      Button
+      </button>
+    </div>
+  </div>
+  
+  <ng-template #objectTemplate let-objectData="objectData">
+    <div
+      class="object-frame"
+      [style.left.px]="objectData.x"
+      [style.bottom.px]="objectData.y"
+      [style.border-color]="objectData.color"
+    >
+      <div class="object-label" [style.background-color]="objectData.color">
+        {{ objectData.label }}
+      </div>
+      <div class="object-data" [style.background-color]="objectData.color">
+        {{ objectData | json }}
+      </div>
+    </div>
+  </ng-template>
+  

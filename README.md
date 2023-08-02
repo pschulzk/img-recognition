@@ -27,12 +27,17 @@ Install dependencies:
 $ npm ci
 ```
 
-Run backend app:
+In another CLI instance, run frontend app for Single Image Recognition:
+```
+$ npm run serve-imgrec-ui
+```
+
+Run backend app for Image Recognition for Movies API:
 ```
 $ npm run serve-movrec-api
 ```
 
-In another CLI instance, run frontend app:
+In another CLI instance, run frontend app for Image Recognition for Movies:
 ```
 $ npm run serve-movrec-ui
 ```
