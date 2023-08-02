@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { FrameMetaData } from '@fbn/fbn-streaming'
+import { FrameMetaData } from '@fbn/fbn-imgrec'
 import { BehaviorSubject, Observable } from 'rxjs'
 
 /**

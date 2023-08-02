@@ -14,6 +14,12 @@
   
   #img-container {
     position: relative;
+
+    img {
+      /* max-width: 100%; */
+      width: 100%;
+      height: auto;
+    }
   }
   
   #img-overlay {
@@ -51,4 +57,14 @@
     left: -0.2rem;
     padding: 0.2rem;
     font-size: 0.8rem;
+  }
+
+  .message {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+
+    &.--error {
+      color: red;
+    }
   }

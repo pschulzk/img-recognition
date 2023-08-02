@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+import { FbnImageRecognitionResponse } from '@fbn/fbn-imgrec'
 import { Observable, catchError, map, throwError } from 'rxjs'
 
 @Injectable({
@@ -13,12 +14,11 @@ export class ImageRecognitionService {
     private http: HttpClient,
   ) { }
 
-  postImage(file: File): Observable<void> {
+  postImage(file: File): Observable<FbnImageRecognitionResponse> {
     const formData:FormData = new FormData()
     formData.append('image', file, `@${file.name}`)
     
     const headers = new HttpHeaders()
-    /** In Angular 5, including the header Content-Type can invalidate your request */
     headers.append('Content-Type', 'multipart/form-data')
     headers.append('Accept', 'application/json')
 
