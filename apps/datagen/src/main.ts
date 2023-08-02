@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { FrameMetaData } from '@fbn/fbn-streaming'
+import { FrameMetaData } from '@fbn/fbn-imgrec'
 
 console.log('Hello World')
 

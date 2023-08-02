@@ -9,7 +9,7 @@ const path = require('path');
 const fs = require('fs');
 const originalResolveFilename = Module._resolveFilename;
 const distPath = __dirname;
-const manifest = [{"module":"@fbn/fbn-streaming","exactMatch":"libs/fbn-streaming/src/index.js","pattern":"libs/fbn-streaming/src/index.ts"}];
+const manifest = [{"module":"@fbn/fbn-imgrec","exactMatch":"libs/fbn-imgrec/src/index.js","pattern":"libs/fbn-imgrec/src/index.ts"}];
 
 Module._resolveFilename = function(request, parent) {
   let found;

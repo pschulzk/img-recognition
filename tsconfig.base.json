@@ -16,7 +16,7 @@
     "baseUrl": ".",
     "resolveJsonModule": true,
     "paths": {
-      "@fbn/fbn-streaming": ["libs/fbn-streaming/src/index.ts"]
+      "@fbn/fbn-imgrec": ["libs/fbn-imgrec/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
