@@ -15,9 +15,8 @@
     <div class="container">
       <br>
       <div id="img-container">
-        <video #video width="100%" controls>
-          <source src="http://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-        </video>
+        <!-- !!! IMG !!! -->
+        <img src="" alt="">
         <div id="img-overlay">
           <ng-container
             *ngFor="let objectData of visualObjects"
@@ -29,13 +28,20 @@
         </div>
       </div>
       <br>
+
+      <!-- UPLOAD -->
+      <input #csvInput hidden="true" type="file" onclick="this.value=null" (change)="imgInputChange($event)" accept="image/*"/>
+      <button mat-flat-button color="primary" (click)="csvInput.click()">Upload Image (*.jpg)</button>
+      <br>
+      <br>
+
       <button
         mat-raised-button
         color="primary"
         aria-label="Redo"
       >
-      <mat-icon>refresh</mat-icon>
-      Button
+        <mat-icon>refresh</mat-icon>
+        Reset
       </button>
     </div>
   </div>

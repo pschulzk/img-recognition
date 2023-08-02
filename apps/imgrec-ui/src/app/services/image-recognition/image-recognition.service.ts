@@ -1,21 +1,31 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { FrameMetaData } from '@fbn/fbn-streaming'
-import { BehaviorSubject, Observable } from 'rxjs'
+import { Observable, catchError, map, throwError } from 'rxjs'
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ImageRecognitionService {
 
-  maxResults = 10000
-  private currentResults = 0
-  
-  get metaDataStream(): Observable<FrameMetaData | null> {
-    return this._metaDataStream.asObservable()
-  }
+  apiEndPoint = '/predict'
 
-  private _metaDataStream = new BehaviorSubject<FrameMetaData | null>(null)
+  constructor(
+    private http: HttpClient,
+  ) { }
 
-  async startMetaDataStream(): Promise<void> {
-    return Promise.resolve()
+  postImage(file: File): Observable<void> {
+    const formData:FormData = new FormData()
+    formData.append('image', file, `@${file.name}`)
+    
+    const headers = new HttpHeaders()
+    /** In Angular 5, including the header Content-Type can invalidate your request */
+    headers.append('Content-Type', 'multipart/form-data')
+    headers.append('Accept', 'application/json')
+
+    return this.http.post(`${this.apiEndPoint}`, formData, { headers }).pipe(
+      map(res => JSON.parse(JSON.stringify(res))),
+      catchError(error => throwError(() => error)),
+    )
   }
 
 }

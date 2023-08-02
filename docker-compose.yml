@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  object-detection-service:
+    image: niggi88/object-detection-service:v1.0
+    hostname: object-detection-service
+    container_name: object-detection-service
+    restart: always
+    ports:
+      - "8000:8000"
