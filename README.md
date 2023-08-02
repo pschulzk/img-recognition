@@ -29,10 +29,10 @@ $ npm ci
 
 Run backend app:
 ```
-$ npm run serve-api
+$ npm run serve-movrec-api
 ```
 
 In another CLI instance, run frontend app:
 ```
-$ npm run serve-ui
+$ npm run serve-movrec-ui
 ```
