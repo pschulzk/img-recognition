@@ -55,16 +55,15 @@
 
   <div class="wrapper">
 
+    <div
+      *ngIf="isLoading$ | async"
+      @rowCollapseAnimation
+      class="spinner-container"
+    >
+      <mat-spinner></mat-spinner>
+    </div>
+
     <div class="container">
-
-      <div
-        *ngIf="isLoading$ | async"
-        @rowCollapseAnimation
-        class="spinner-container"
-      >
-        <mat-spinner></mat-spinner>
-      </div>
-
       <br>
 
       <p
