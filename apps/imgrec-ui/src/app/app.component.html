@@ -54,7 +54,17 @@
   </mat-toolbar>
 
   <div class="wrapper">
+
     <div class="container">
+
+      <div
+        *ngIf="isLoading$ | async"
+        @rowCollapseAnimation
+        class="spinner-container"
+      >
+        <mat-spinner></mat-spinner>
+      </div>
+
       <br>
 
       <p
@@ -66,14 +76,6 @@
       </p>
 
       <div id="img-container">
-        <div
-          *ngIf="isLoading$ | async"
-          @rowCollapseAnimation
-          class="spinner-container"
-        >
-          <mat-spinner></mat-spinner>
-        </div>
-
         <!-- USER UPLOADED IMG -->
         <img
           *ngIf="imgUrl"
