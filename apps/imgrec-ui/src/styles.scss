@@ -41,6 +41,12 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
+/* GLOBAL CLASSES */
+
 .dark-theme {
   @include mat.all-component-colors($dark-theme);
+}
+
+.mat-error {
+  color: mat.get-color-from-palette($fbn-warn, 500);
 }

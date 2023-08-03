@@ -1,3 +1,3 @@
-export * from './lib/models/streaming.model'
-export * from './lib/models/imgrec.model'
-export * from './lib/utils/tap-once'
+export * from './lib/animations'
+export * from './lib/models'
+export * from './lib/utils'

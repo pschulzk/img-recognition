@@ -1,7 +1,7 @@
 import { OverlayContainer } from '@angular/cdk/overlay'
 import { Component, ElementRef, ViewChild } from '@angular/core'
 import { MatSlideToggleChange } from '@angular/material/slide-toggle'
-import { FbnImageRecognitionDetection, FbnImageRecognitionResponse } from '@fbn/fbn-imgrec'
+import { FbnImageRecognitionDetection, FbnImageRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
 import { BehaviorSubject, finalize, tap } from 'rxjs'
 import { ImageRecognitionService } from './services/image-recognition/image-recognition.service'
@@ -20,6 +20,7 @@ export interface VisualObjectData {
   selector: 'fbn-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  animations: [rowCollapseAnimation],
 })
 export class AppComponent {
   isLoading$ = new BehaviorSubject<boolean>(false)
@@ -57,9 +58,9 @@ export class AppComponent {
     }
 
     // request image recognition meta  data
+    this.isLoading$.next(true)
     this.imageRecognitionService.postImage(uploadedImageFile).pipe(
       untilDestroyed(this),
-      tap(() => this.isLoading$.next(true)),
       finalize(() => this.isLoading$.next(false)),
     ).subscribe(
       (res: FbnImageRecognitionResponse) => {
