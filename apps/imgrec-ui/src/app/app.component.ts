@@ -1,8 +1,10 @@
+import { OverlayContainer } from '@angular/cdk/overlay'
 import { Component, ElementRef, ViewChild } from '@angular/core'
-import { ImageRecognitionService } from './services/image-recognition/image-recognition.service'
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
+import { MatSlideToggleChange } from '@angular/material/slide-toggle'
 import { FbnImageRecognitionDetection, FbnImageRecognitionResponse } from '@fbn/fbn-imgrec'
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
 import { BehaviorSubject, finalize, tap } from 'rxjs'
+import { ImageRecognitionService } from './services/image-recognition/image-recognition.service'
 
 export interface VisualObjectData {
   data: FbnImageRecognitionDetection
@@ -30,28 +32,28 @@ export class AppComponent {
 
   errorHasNoPredictions$ = new BehaviorSubject<boolean>(false)
 
+  themeToggleDarkTheme = true
+
   constructor(
     private imageRecognitionService: ImageRecognitionService,
+    private overlay: OverlayContainer,
   ) { }
 
   imgInputChange(fileInputEvent: Event) {
     this.reset()
     // read uploaded image file from event
     const element = fileInputEvent.currentTarget as HTMLInputElement
-    console.log('!!! element', element)
     const fileList: FileList | null = element.files
     if (!fileList?.item(0)) {
       throw new Error('No files selected')
     }
     const uploadedImageFile = fileList.item(0) as File
-    // const img = new Image()
 
     // generate img src URL
     const reader = new FileReader()
     reader.readAsDataURL(uploadedImageFile) 
     reader.onload = () => { 
       this.imgUrl = reader.result as string
-      // img.src = this.imgUrl
     }
 
     // request image recognition meta  data
@@ -80,7 +82,7 @@ export class AppComponent {
             height: detection.box.h * imageHeight,
             left: (detection.box.x * imageWidth) - (detection.box.w * imageWidth / 2),
             bottom: (detection.box.y * imageHeight) - (detection.box.h * imageHeight / 2) ,
-            color: this.getRandomColor(),
+            color: this.getRandomLighterColor(),
           }
         })
       }
@@ -93,11 +95,22 @@ export class AppComponent {
     this.errorHasNoPredictions$.next(false)
   }
 
-  private getRandomColor() {
+  themeToggleChange(event: MatSlideToggleChange) {
+    const darkThemeClassName = 'dark-theme'
+    this.themeToggleDarkTheme = event.checked
+    if (this.themeToggleDarkTheme) {
+      this.overlay.getContainerElement().classList.add(darkThemeClassName)
+    } else {
+      this.overlay.getContainerElement().classList.remove(darkThemeClassName)
+    }
+  }
+
+  private getRandomLighterColor() {
     const letters = '0123456789ABCDEF'
     let color = '#'
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * letters.length)]
+    for (let i = 0; i < 3; i++) {
+      const randomLetter = letters[Math.floor(Math.random() * letters.length)]
+      color += randomLetter + randomLetter
     }
     return color
   }

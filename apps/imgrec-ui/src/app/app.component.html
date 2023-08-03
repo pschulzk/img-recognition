@@ -1,76 +1,89 @@
-<mat-toolbar color="primary">
-  <button mat-icon-button aria-label="Example icon-button with menu icon">
-    <mat-icon>menu</mat-icon>
-  </button>
-  <span>Image Recognition</span>
-  <span class="example-spacer"></span>
-</mat-toolbar>
+<div class="content mat-app-background" [class.dark-theme]="themeToggleDarkTheme">
+  <mat-toolbar color="primary">
+    <button mat-icon-button aria-label="Example icon-button with menu icon">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span>Image Recognition</span>
+    <span class="spacer"></span>
+      <div class="flex-stretch"></div>
+      <section class="toggle-section">
+        <mat-icon>brightness_5</mat-icon>
+        <div class="__togge-container">
+          <mat-slide-toggle (change)="themeToggleChange($event)" color="primary" [checked]="true">
+          </mat-slide-toggle>
+        </div>
+        <mat-icon>bedtime</mat-icon>
+      </section>
+  </mat-toolbar>
 
-<div class="wrapper">
-  <div class="container">
-    <div class="action-bar">
+  <div class="wrapper">
+    <div class="container">
+      <h1 class="mat-h1">test test test</h1>
+      <p class="mat-body">asdasdasdasd</p>
+      <div class="action-bar">
+        <br>
+
+        <!-- UPLOAD -->
+        <input #csvInput hidden="true" type="file" onclick="this.value=null" (change)="imgInputChange($event)" accept="image/*"/>
+        <button mat-flat-button color="primary" (click)="csvInput.click()">Upload Image (*.jpg)</button>
+        <br>
+        <br>
+
+        <!-- RESET -->
+        <button
+          mat-raised-button
+          color="primary"
+          aria-label="Redo"
+          (click)="reset()"
+        >
+          <mat-icon>refresh</mat-icon>
+          Reset
+        </button>
+      </div>
+
       <br>
 
-      <!-- UPLOAD -->
-      <input #csvInput hidden="true" type="file" onclick="this.value=null" (change)="imgInputChange($event)" accept="image/*"/>
-      <button mat-flat-button color="primary" (click)="csvInput.click()">Upload Image (*.jpg)</button>
-      <br>
+      <p class="message --error" *ngIf="errorHasNoPredictions$ | async">No detections available. Please try again or try another image.</p>
+
       <br>
 
-      <!-- RESET -->
-      <button
-        mat-raised-button
-        color="primary"
-        aria-label="Redo"
-        (click)="reset()"
-      >
-        <mat-icon>refresh</mat-icon>
-        Reset
-      </button>
-    </div>
-
-    <br>
-
-    <p class="message --error" *ngIf="errorHasNoPredictions$ | async">No detections available. Please try again or try another image.</p>
-
-    <br>
-
-    <mat-spinner *ngIf="isLoading$ | async"></mat-spinner>
-    <div id="img-container">
-      <!-- USER UPLOADED IMG -->
-      <img
-        *ngIf="imgUrl"
-        #userImage
-        [src]="imgUrl"
-        alt="your uploaded image"
-      >
-      <div id="img-overlay">
-        <ng-container
-          *ngFor="let objectData of visualObjects"
-          [ngTemplateOutlet]="objectTemplate"
-          [ngTemplateOutletContext]="{
-            objectData,
-          }"
-        ></ng-container>
+      <mat-spinner *ngIf="isLoading$ | async"></mat-spinner>
+      <div id="img-container">
+        <!-- USER UPLOADED IMG -->
+        <img
+          *ngIf="imgUrl"
+          #userImage
+          [src]="imgUrl"
+          alt="your uploaded image"
+        >
+        <div id="img-overlay">
+          <ng-container
+            *ngFor="let objectData of visualObjects"
+            [ngTemplateOutlet]="objectTemplate"
+            [ngTemplateOutletContext]="{
+              objectData,
+            }"
+          ></ng-container>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<ng-template #objectTemplate let-objectData="objectData">
-  <div
-    class="object-frame"
-    [style.left.px]="objectData.left"
-    [style.bottom.px]="objectData.bottom"
-    [style.width.px]="objectData.width"
-    [style.height.px]="objectData.height"
-    [style.border-color]="objectData.color"
-  >
-    <div class="object-label" [style.background-color]="objectData.color">
-      {{ objectData.data.class_name }}
+  <ng-template #objectTemplate let-objectData="objectData">
+    <div
+      class="object-frame"
+      [style.left.px]="objectData.left"
+      [style.bottom.px]="objectData.bottom"
+      [style.width.px]="objectData.width"
+      [style.height.px]="objectData.height"
+      [style.border-color]="objectData.color"
+    >
+      <div class="object-label" [style.background-color]="objectData.color">
+        {{ objectData.data.class_name }}
+      </div>
+      <div class="object-data" [style.background-color]="objectData.color">
+        {{ objectData | json }}
+      </div>
     </div>
-    <div class="object-data" [style.background-color]="objectData.color">
-      {{ objectData | json }}
-    </div>
-  </div>
-</ng-template>
+  </ng-template>
+</div>
