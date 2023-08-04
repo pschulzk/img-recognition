@@ -1,5 +1,5 @@
 import { OverlayContainer } from '@angular/cdk/overlay'
-import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core'
 import { MatSlideToggleChange } from '@angular/material/slide-toggle'
 import { ColorUtils, FbnImageRecognitionDetection, FbnImageRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
@@ -16,12 +16,14 @@ export interface VisualObjectData {
   opacity: number
 }
 
+
 @UntilDestroy()
 @Component({
   selector: 'fbn-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   animations: [rowCollapseAnimation],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
   isLoading$ = new BehaviorSubject<boolean>(false)
@@ -43,6 +45,10 @@ export class AppComponent {
     private overlay: OverlayContainer,
     private cd: ChangeDetectorRef,
   ) { }
+
+  identify(index: number, item: VisualObjectData) {
+    return item.data.confidence
+  }
 
   imgInputChange(fileInputEvent: Event) {
     this.reset()
@@ -82,14 +88,15 @@ export class AppComponent {
         this.imageWidth = imageWidth
         this.imageHeight = imageHeight
 
-        this.visualObjects = res.detections.map((detection) => ({
+        this.visualObjects = this.sortByDistanceFromCenter(res.detections).map((detection) => ({
           data: detection,
           width: detection.box.w * imageWidth,
           height: detection.box.h * imageHeight,
           left: (detection.box.x * imageWidth) - ((detection.box.w * imageWidth) / 2),
           bottom: imageHeight - ((detection.box.y * imageHeight) + (detection.box.h * imageHeight) / 2),
           color: ColorUtils.getRandomBrightColor(),
-          opacity: detection.confidence < 0.8 ? 0.3 : 1,
+          // if confidence is low than make less visible
+          opacity: detection.confidence < 0.8 ? 0.4 : 1,
         }))
       }
     )
@@ -120,5 +127,31 @@ export class AppComponent {
     } else {
       this.overlay.getContainerElement().classList.remove(darkThemeClassName)
     }
+  }
+
+  private getDistanceFromCenter(item: FbnImageRecognitionDetection): number {
+    // Calculate the center of the item
+    const itemCenterX = item.box.x + item.box.w / 2
+    const itemCenterY = item.box.y + item.box.h / 2
+  
+    // Assuming the image grid's center is at (imageGridCenterX, imageGridCenterY)
+    const imageGridCenterX = 0 // Replace with the actual center X-coordinate of the image grid
+    const imageGridCenterY = 0 // Replace with the actual center Y-coordinate of the image grid
+  
+    // Calculate the distance from the image grid's center
+    const distanceX = Math.abs(itemCenterX - imageGridCenterX)
+    const distanceY = Math.abs(itemCenterY - imageGridCenterY)
+  
+    // Use Euclidean distance formula to get the total distance
+    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY)
+    return distance
+  }
+  
+  private sortByDistanceFromCenter(items: FbnImageRecognitionDetection[]): FbnImageRecognitionDetection[] {
+    return items.sort((a, b) => {
+      const distanceA = this.getDistanceFromCenter(a)
+      const distanceB = this.getDistanceFromCenter(b)
+      return distanceA - distanceB
+    })
   }
 }

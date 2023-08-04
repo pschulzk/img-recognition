@@ -91,7 +91,7 @@
           [style.height.px]="imageHeight"
         >
           <ng-container
-            *ngFor="let objectData of visualObjects"
+            *ngFor="let objectData of visualObjects; trackBy:identify"
             [ngTemplateOutlet]="objectTemplate"
             [ngTemplateOutletContext]="{
               objectData,
