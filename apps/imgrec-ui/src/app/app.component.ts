@@ -1,9 +1,9 @@
 import { OverlayContainer } from '@angular/cdk/overlay'
 import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core'
 import { MatSlideToggleChange } from '@angular/material/slide-toggle'
-import { FbnImageRecognitionDetection, FbnImageRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
+import { ColorUtils, FbnImageRecognitionDetection, FbnImageRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
-import { BehaviorSubject, finalize, tap } from 'rxjs'
+import { BehaviorSubject, finalize } from 'rxjs'
 import { ImageRecognitionService } from './services/image-recognition/image-recognition.service'
 
 export interface VisualObjectData {
@@ -88,7 +88,7 @@ export class AppComponent {
           height: detection.box.h * imageHeight,
           left: (detection.box.x * imageWidth) - ((detection.box.w * imageWidth) / 2),
           bottom: imageHeight - ((detection.box.y * imageHeight) + (detection.box.h * imageHeight) / 2),
-          color: this.getRandomLighterColor(),
+          color: ColorUtils.getRandomBrightColor(),
           opacity: detection.confidence < 0.8 ? 0.3 : 1,
         }))
       }
@@ -120,15 +120,5 @@ export class AppComponent {
     } else {
       this.overlay.getContainerElement().classList.remove(darkThemeClassName)
     }
-  }
-
-  private getRandomLighterColor() {
-    const letters = '0123456789ABCDEF'
-    let color = '#'
-    for (let i = 0; i < 3; i++) {
-      const randomLetter = letters[Math.floor(Math.random() * letters.length)]
-      color += randomLetter + randomLetter
-    }
-    return color
   }
 }
