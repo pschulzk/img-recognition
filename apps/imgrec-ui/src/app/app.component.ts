@@ -1,5 +1,5 @@
 import { OverlayContainer } from '@angular/cdk/overlay'
-import { Component, ElementRef, ViewChild } from '@angular/core'
+import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core'
 import { MatSlideToggleChange } from '@angular/material/slide-toggle'
 import { FbnImageRecognitionDetection, FbnImageRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
@@ -13,6 +13,7 @@ export interface VisualObjectData {
   left: number
   bottom: number
   color: string
+  opacity: number
 }
 
 @UntilDestroy()
@@ -30,6 +31,8 @@ export class AppComponent {
   visualObjects: VisualObjectData[] = []
 
   @ViewChild('userImage', { static: false, read: ElementRef }) userImage?: ElementRef<HTMLImageElement>
+  imageWidth?: number
+  imageHeight?: number
 
   errorHasNoPredictions$ = new BehaviorSubject<boolean>(false)
 
@@ -38,6 +41,7 @@ export class AppComponent {
   constructor(
     private imageRecognitionService: ImageRecognitionService,
     private overlay: OverlayContainer,
+    private cd: ChangeDetectorRef,
   ) { }
 
   imgInputChange(fileInputEvent: Event) {
@@ -55,6 +59,7 @@ export class AppComponent {
     reader.readAsDataURL(uploadedImageFile) 
     reader.onload = () => { 
       this.imgUrl = reader.result as string
+      this.cd.detectChanges()
     }
 
     // request image recognition meta  data
@@ -69,25 +74,36 @@ export class AppComponent {
           return
         }
         this.errorHasNoPredictions$.next(false)
-        
-        this.visualObjects = res.detections.map((detection) => {
-          if (!this.userImage?.nativeElement) {
-            throw new Error('No image element')
-          }
-          const imageWidth = this.userImage.nativeElement.width as number
-          const imageHeight = this.userImage.nativeElement.height as number
-          console.log('!!! this.userImage!.nativeElement', imageWidth, imageHeight)
-          return {
-            data: detection,
-            width: detection.box.w * imageWidth,
-            height: detection.box.h * imageHeight,
-            left: (detection.box.x * imageWidth) - (detection.box.w * imageWidth / 2),
-            bottom: (detection.box.y * imageHeight) - (detection.box.h * imageHeight / 2) ,
-            color: this.getRandomLighterColor(),
-          }
-        })
+
+        if (!this.userImage?.nativeElement) {
+          throw new Error('No image element')
+        }
+        const { imageWidth, imageHeight } = this.getContainedSize(this.userImage.nativeElement)
+        this.imageWidth = imageWidth
+        this.imageHeight = imageHeight
+
+        this.visualObjects = res.detections.map((detection) => ({
+          data: detection,
+          width: detection.box.w * imageWidth,
+          height: detection.box.h * imageHeight,
+          left: (detection.box.x * imageWidth) - ((detection.box.w * imageWidth) / 2),
+          bottom: imageHeight - ((detection.box.y * imageHeight) + (detection.box.h * imageHeight) / 2),
+          color: this.getRandomLighterColor(),
+          opacity: detection.confidence < 0.8 ? 0.3 : 1,
+        }))
       }
     )
+  }
+
+  getContainedSize(img: HTMLImageElement): { imageWidth: number, imageHeight: number } {
+    const ratio = img.naturalWidth/img.naturalHeight
+    let imageWidth = img.height * ratio
+    let imageHeight = img.height
+    if (imageWidth > img.width) {
+      imageWidth = img.width
+      imageHeight = img.width/ratio
+    }
+    return { imageWidth, imageHeight }
   }
 
   reset() {

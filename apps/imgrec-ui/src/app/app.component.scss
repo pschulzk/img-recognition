@@ -76,10 +76,12 @@
 #img-overlay {
   position: absolute;
   z-index: 1;
+  overflow: hidden;
   left: 0;
+  right: 0;
+  bottom: 0;
   top: 0;
-  width: 100%;
-  height: calc(100% - 5rem);
+  margin: auto;
 }
 
 .object-frame {
@@ -94,6 +96,8 @@
   
   &:hover {
     background-color: rgba(white, 0.2);
+    z-index: 1;
+    opacity: 1;
     
     & .object-data {
       visibility: visible;
@@ -120,7 +124,7 @@
   opacity: 0;
   transition: visible 0.2s ease-in-out, opacity 0.2s ease-in-out;
 
-  font-size: 0.8rem;
+  font-size: 0.9rem;
 }
 
 .message {
