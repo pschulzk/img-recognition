@@ -74,7 +74,6 @@
     "@schematics/angular": "~16.1.0",
     "@types/jest": "^29.4.0",
     "@types/node": "~18.7.1",
-    "@types/uuidv4": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^5.60.1",
     "@typescript-eslint/parser": "^5.60.1",
     "cypress": "^12.11.0",
