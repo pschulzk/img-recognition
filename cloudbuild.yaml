@@ -25,5 +25,5 @@ steps:
            '--container-image',
            'europe-central2-docker.pkg.dev/imgrec-395114/freecoll/imgrec-ui']
     env:
-      - 'CLOUDSDK_COMPUTE_REGION=europe-west12'
-      - 'CLOUDSDK_COMPUTE_ZONE=europe-west12-a'
+      - 'CLOUDSDK_COMPUTE_REGION=europe-central2'
+      - 'CLOUDSDK_COMPUTE_ZONE=europe-central2-a'
