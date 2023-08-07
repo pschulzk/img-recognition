@@ -1,0 +1,50 @@
+---
+apiVersion: "v1"
+kind: "Namespace"
+metadata:
+  name: "freecoll"
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "imgrec"
+  namespace: "freecoll"
+  labels:
+    app: "imgrec"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "imgrec"
+  template:
+    metadata:
+      labels:
+        app: "imgrec"
+    spec:
+      containers:
+      - name: "object-detection-service"
+        image: "niggi88/object-detection-service:v1.0"
+      - name: "imgrec-ui"
+        image: "europe-central2-docker.pkg.dev/imgrec-395114/freecoll/imgrec-ui@sha256:70aa462d8f1f7d53c5619107b117755d1c11abba7430d14f12e201496e6ecf51"
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "imgrec-hpa-mypr"
+  namespace: "freecoll"
+  labels:
+    app: "imgrec"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "imgrec"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      target:
+        type: "Utilization"
+        averageUtilization: 80

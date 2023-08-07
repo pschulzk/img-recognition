@@ -16,14 +16,14 @@ steps:
     args: ['push',
            'europe-central2-docker.pkg.dev/imgrec-395114/freecoll/imgrec-ui']
 
-  # Entrypoint, timeout and environment variables
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
-    timeout: 240s
-    args: ['compute', 'instances',
-           'create-with-container', 'imgrec-ui',
-           '--container-image',
-           'europe-central2-docker.pkg.dev/imgrec-395114/freecoll/imgrec-ui']
-    env:
-      - 'CLOUDSDK_COMPUTE_REGION=europe-central2'
-      - 'CLOUDSDK_COMPUTE_ZONE=europe-central2-a'
+  # # Entrypoint, timeout and environment variables
+  # - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  #   entrypoint: 'gcloud'
+  #   timeout: 240s
+  #   args: ['compute', 'instances',
+  #          'create-with-container', 'imgrec-ui',
+  #          '--container-image',
+  #          'europe-central2-docker.pkg.dev/imgrec-395114/freecoll/imgrec-ui']
+  #   env:
+  #     - 'CLOUDSDK_COMPUTE_REGION=europe-central2'
+  #     - 'CLOUDSDK_COMPUTE_ZONE=europe-central2-a'

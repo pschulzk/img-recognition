@@ -1,7 +1,0 @@
-apiVersion: skaffold/v3
-kind: Config
-manifests:
- rawYaml:
- - ./cicd/k8s/*
-deploy:
- kubectl: {}
