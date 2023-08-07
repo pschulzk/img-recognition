@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: Pod
-metadata:
-  name: imgrec-ui
-spec:
-  containers:
-  - name: imgrec-ui
-    image: europe-central2-docker.pkg.dev/imgrec-395114/freecoll/imgrec-ui
