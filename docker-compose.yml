@@ -8,3 +8,10 @@ services:
     restart: always
     ports:
       - "8000:8000"
+  imgrec-ui:
+    image: europe-central2-docker.pkg.dev/imgrec-395114/freecoll/imgrec-ui
+    hostname: imgrec-ui
+    depends_on:
+      - object-detection-service
+    ports:
+      - "80:80"
