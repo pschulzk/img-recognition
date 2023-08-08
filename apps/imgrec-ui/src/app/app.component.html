@@ -1,4 +1,4 @@
-<div class="content mat-app-background" [class.dark-theme]="themeToggleDarkTheme">
+<div class="content mat-app-background" [class.dark-theme]="isDarkTheme">
   <mat-toolbar color="primary">
     <button mat-icon-button aria-label="Example icon-button with menu icon">
       <mat-icon>menu</mat-icon>
@@ -34,9 +34,10 @@
     <button
       mat-raised-button
       color="primary"
+      (click)="openDialog()"
     >
       <mat-icon>help_outlined</mat-icon> 
-      Help
+      Info
     </button>
 
     <!-- TOGGLE DARK MODE -->
@@ -45,7 +46,7 @@
       <div class="__togge-container">
         <mat-slide-toggle
           color="primary"
-          [checked]="themeToggleDarkTheme"
+          [checked]="isDarkTheme"
           (change)="themeToggleChange($event)">
         </mat-slide-toggle>
       </div>

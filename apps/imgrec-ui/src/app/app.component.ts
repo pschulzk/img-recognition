@@ -5,6 +5,8 @@ import { ColorUtils, FbnImageRecognitionDetection, FbnImageRecognitionResponse, 
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
 import { BehaviorSubject, finalize } from 'rxjs'
 import { ImageRecognitionService } from './services/image-recognition/image-recognition.service'
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
+import { DialogComponent } from './components/dialog/dialog.component'
 
 export interface VisualObjectData {
   data: FbnImageRecognitionDetection
@@ -38,12 +40,13 @@ export class AppComponent {
 
   errorHasNoPredictions$ = new BehaviorSubject<boolean>(false)
 
-  themeToggleDarkTheme = true
+  isDarkTheme = true
 
   constructor(
     private imageRecognitionService: ImageRecognitionService,
     private overlay: OverlayContainer,
     private cd: ChangeDetectorRef,
+    private dialog: MatDialog,
   ) { }
 
   identify(index: number, item: VisualObjectData) {
@@ -120,13 +123,7 @@ export class AppComponent {
   }
 
   themeToggleChange(event: MatSlideToggleChange) {
-    const darkThemeClassName = 'dark-theme'
-    this.themeToggleDarkTheme = event.checked
-    if (this.themeToggleDarkTheme) {
-      this.overlay.getContainerElement().classList.add(darkThemeClassName)
-    } else {
-      this.overlay.getContainerElement().classList.remove(darkThemeClassName)
-    }
+    this.isDarkTheme = event.checked
   }
 
   private getDistanceFromCenter(item: FbnImageRecognitionDetection): number {
@@ -153,5 +150,29 @@ export class AppComponent {
       const distanceB = this.getDistanceFromCenter(b)
       return distanceA - distanceB
     })
+  }
+
+  openDialog() {
+    const dialogConfig = new MatDialogConfig<{
+      title: string,
+      content: string,
+    }>()
+    dialogConfig.width = '400px'
+    dialogConfig.data = {
+      title: 'Info',
+      content: 'This application is for demoing object recognition in images. Please upload an image of type JPG and see the results.',
+    }
+
+    dialogConfig.disableClose = true
+    dialogConfig.autoFocus = true
+
+    this.dialog.open(DialogComponent, dialogConfig)
+
+    const darkThemeClassName = 'dark-theme'
+    if (this.isDarkTheme) {
+      this.overlay.getContainerElement().classList.add(darkThemeClassName)
+    } else {
+      this.overlay.getContainerElement().classList.remove(darkThemeClassName)
+    }
   }
 }
