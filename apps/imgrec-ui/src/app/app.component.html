@@ -15,7 +15,7 @@
       color="primary"
       (click)="imgInput.click()"
     >
-      <mat-icon>upload</mat-icon> 
+      <mat-icon>upload</mat-icon>
       Upload Image
     </button>
 
@@ -74,22 +74,37 @@
         No detections available. Please try again or try another image.
       </p>
 
-      <div id="img-container">
-        <!-- USER UPLOADED IMG -->
-        <img
-          *ngIf="imgUrl"
-          #userImage
-          @rowCollapseAnimation
-          [class.--loading]="isLoading$ | async"
-          [src]="imgUrl"
-          alt="your uploaded image"
-        >
+      <div class="img-container">
+        <ng-container [ngSwitch]="!!imgUrl">
+          <!-- USER UPLOADED IMG -->
+          <img
+            *ngSwitchCase="true"
+            #userImage
+            @rowCollapseAnimation
+            [class.--loading]="isLoading$ | async"
+            [src]="imgUrl"
+            alt="your uploaded image"
+          >
+        </ng-container>
 
         <div
-          id="img-overlay"
+          class="img-overlay"
           [style.width.px]="imageWidth"
           [style.height.px]="imageHeight"
         >
+          <!-- PLACEHOLDER -->
+          <div
+            *ngIf="!imgUrl" class="user-image-placeholder"
+            (click)="imgInput.click()"
+          >
+            <mat-icon
+              class="__icon"
+            >
+              upload
+            </mat-icon>
+            <div class="__label">Upload Image</div>
+          </div>
+          
           <ng-container
             *ngFor="let objectData of visualObjects; trackBy:identify"
             [ngTemplateOutlet]="objectTemplate"
