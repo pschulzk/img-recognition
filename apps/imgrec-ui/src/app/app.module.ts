@@ -11,7 +11,6 @@ import { MatToolbarModule } from '@angular/material/toolbar'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { AppComponent } from './app.component'
 import { DialogComponent } from './components/dialog/dialog.component'
-// import { MatCommonModule } from '@angular/material/core'
 
 @NgModule({
   declarations: [AppComponent, DialogComponent],
@@ -20,7 +19,6 @@ import { DialogComponent } from './components/dialog/dialog.component'
     FormsModule,
     HttpClientModule,
     MatButtonModule,
-    // MatCommonModule,
     MatDialogModule,
     MatIconModule,
     MatProgressSpinnerModule,

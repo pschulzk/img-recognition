@@ -158,6 +158,9 @@ export class AppComponent {
       content: string,
     }>()
     dialogConfig.width = '400px'
+    dialogConfig.position = {
+      top: '100px',
+    }
     dialogConfig.data = {
       title: 'Info',
       content: 'This application is for demoing object recognition in images. Please upload an image of type JPG and see the results.',
