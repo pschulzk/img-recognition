@@ -96,6 +96,7 @@
           <!-- PLACEHOLDER -->
           <div
             *ngIf="!imgUrl" class="user-image-placeholder"
+            @rowCollapseAnimation
             (click)="imgInput.click()"
           >
             <mat-icon
