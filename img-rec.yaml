@@ -1,0 +1,109 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: object-detection-backend
+  namespace: freecoll
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: object-detection
+        image: niggi88/object-detection-service:v1.2
+        ports:
+        - name: http
+          containerPort: 8000
+        readinessProbe:
+          httpGet:
+            path: /healthcheck
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthcheck
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imgrec-ui
+  namespace: freecoll
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: imgrec-ui-frontend
+        image: europe-central2-docker.pkg.dev/imgrec-395114/freecoll/imgrec-ui
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: object-detection-svc
+  namespace: freecoll
+spec:
+  selector:
+     app: backend
+  ports:
+    - protocol: TCP
+      port: 8000
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: imgrec-ui-svc
+  namespace: freecoll
+spec:
+  selector:
+     app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+#  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: img-rec-ingress
+  namespace: freecoll
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: imgrec-ui-svc
+            port:
+              number: 80
+      - path: /predict
+        pathType: Prefix
+        backend:
+          service:
+            name: object-detection-svc
+            port:
+              number: 8000
