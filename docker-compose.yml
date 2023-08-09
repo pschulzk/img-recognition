@@ -7,7 +7,7 @@ networks:
 
 services:
   object-detection-service:
-    image: niggi88/object-detection-service:v1.1
+    image: niggi88/object-detection-service:v1.2
     hostname: object-detection-service
     container_name: object-detection-service
     restart: always
