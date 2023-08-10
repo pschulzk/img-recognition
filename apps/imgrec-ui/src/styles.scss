@@ -11,8 +11,13 @@ $fbn-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
 $fbn-warn: mat.define-palette(mat.$red-palette);
 
 $fbn-primary-color: mat.get-color-from-palette($fbn-primary, 400);
-$fbn-accent-color: mat.get-color-from-palette($fbn-accent, 400);
 $fbn-warn-color: mat.get-color-from-palette($fbn-warn, 400);
+
+/* declare as global CSS variables */
+:root {
+  --fbn-primary-color: #5c6bc0;
+  --fbn-warn-color: #f44336;
+}
 
 $default-typography: mat.define-typography-config();
 
