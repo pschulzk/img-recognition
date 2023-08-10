@@ -7,17 +7,7 @@ import { BehaviorSubject, finalize } from 'rxjs'
 import { ImageRecognitionService } from './services/image-recognition/image-recognition.service'
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
 import { DialogComponent } from './components/dialog/dialog.component'
-
-export interface VisualObjectData {
-  data: FbnImageRecognitionDetection
-  width: number
-  height: number
-  left: number
-  bottom: number
-  color: string
-  opacity: number
-}
-
+import { VisualObjectData } from './components/object-frame/object-frame.component'
 
 @UntilDestroy()
 @Component({
@@ -50,7 +40,7 @@ export class AppComponent {
   ) { }
 
   identify(index: number, item: VisualObjectData) {
-    return item.data.confidence
+    return String(item.data.confidence)
   }
 
   imgInputChange(fileInputEvent: Event) {

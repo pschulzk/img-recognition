@@ -1,8 +1,8 @@
 <div class="content mat-app-background" [class.dark-theme]="isDarkTheme">
   <mat-toolbar color="primary">
-    <button mat-icon-button aria-label="Example icon-button with menu icon">
+    <!-- <button mat-icon-button aria-label="Example icon-button with menu icon">
       <mat-icon>menu</mat-icon>
-    </button>
+    </button> -->
     <span class="title">Image Recognition</span>
     
     <span class="spacer"></span>
@@ -95,7 +95,7 @@
         >
           <!-- PLACEHOLDER -->
           <div
-            *ngIf="!imgUrl" class="user-image-placeholder"
+            *ngIf="!imgUrl && !(isLoading$ | async)" class="user-image-placeholder"
             @rowCollapseAnimation
             (click)="imgInput.click()"
           >
@@ -106,36 +106,15 @@
             </mat-icon>
             <div class="__label">Upload Image</div>
           </div>
-          
-          <ng-container
+
+          <!-- OBJECT FRAME -->
+          <fbn-object-frame
             *ngFor="let objectData of visualObjects; trackBy:identify"
-            [ngTemplateOutlet]="objectTemplate"
-            [ngTemplateOutletContext]="{
-              objectData,
-            }"
-          ></ng-container>
+            [objectData]="objectData"
+          >
+          </fbn-object-frame>
         </div>
       </div>
     </div>
   </div>
-
-  <ng-template #objectTemplate let-objectData="objectData">
-    <div
-      class="object-frame"
-      @rowCollapseAnimation
-      [style.left.px]="objectData.left"
-      [style.bottom.px]="objectData.bottom"
-      [style.width.px]="objectData.width"
-      [style.height.px]="objectData.height"
-      [style.border-color]="objectData.color"
-      [style.opacity]="objectData.opacity"
-    >
-      <div class="object-label" [style.background-color]="objectData.color">
-        <b>{{ objectData.data.class_name }}</b>
-      </div>
-      <div class="object-data" [style.background-color]="objectData.color">
-        <b>Confidence</b>: <span class="confidence">{{ objectData.data.confidence | json }}</span>
-      </div>
-    </div>
-  </ng-template>
 </div>

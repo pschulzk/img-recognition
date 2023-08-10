@@ -1,0 +1,43 @@
+.object-frame {
+  background-color: transparent;
+  position: absolute;
+  width: 8rem;
+  height: 6rem;
+  border: 0.2rem solid blue;
+  transition: background-color 0.2s ease-in-out;
+  box-shadow: 0 0 1.5rem rgba(black, 0.75), 0 0 1.5rem rgba(black, 0.75) inset;
+  
+  color: black;
+  
+  &:hover {
+    background-color: rgba(white, 0.2);
+    z-index: 1;
+    opacity: 1;
+    
+    & .object-data {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+
+  & .confidence {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.object-data {
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  left: -0.2rem;
+  padding: 0.2rem;
+
+  visibility: hidden;
+  opacity: 0;
+  transition: visible 0.2s ease-in-out, opacity 0.2s ease-in-out;
+
+  font-size: 0.9rem;
+}
