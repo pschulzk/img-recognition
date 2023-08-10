@@ -8,7 +8,7 @@ import { Observable, catchError, map, of, throwError } from 'rxjs'
 })
 export class ImageRecognitionService {
 
-  apiEndPoint = '/object-detection-service-api'
+  apiEndPoint = ''
 
   constructor(
     private http: HttpClient,

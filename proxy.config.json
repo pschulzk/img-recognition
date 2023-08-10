@@ -4,10 +4,14 @@
     "secure": false,
     "changeOrigin": true
   },
-  "/object-detection-service/*": {
+  "/healthcheck": {
     "target": "http://localhost:8000",
-    "pathRewrite": { "^/object-detection-service-api" : "" },
     "secure": false,
     "changeOrigin": true
-  }  
+  },
+  "/predict": {
+    "target": "http://localhost:8000",
+    "secure": false,
+    "changeOrigin": true
+  }
 }
