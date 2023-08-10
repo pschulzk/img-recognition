@@ -55,7 +55,6 @@
   </mat-toolbar>
 
   <div class="wrapper">
-
     <div
       *ngIf="isLoading$ | async"
       @rowCollapseAnimation
@@ -83,46 +82,13 @@
         ERROR: No objects could be identified. Please try again or try another image.
       </p>
 
-      <div class="img-container">
-        <ng-container [ngSwitch]="!!imgUrl">
-          <!-- USER UPLOADED IMG -->
-          <img
-            *ngSwitchCase="true"
-            #userImage
-            @rowCollapseAnimation
-            [class.--loading]="isLoading$ | async"
-            [src]="imgUrl"
-            alt="your uploaded image"
-          >
-        </ng-container>
-
-        <div
-          class="img-overlay"
-          [style.width.px]="imageWidth"
-          [style.height.px]="imageHeight"
-        >
-          <!-- PLACEHOLDER -->
-          <div
-            *ngIf="!imgUrl && !(isLoading$ | async)" class="user-image-placeholder"
-            @rowCollapseAnimation
-            (click)="imgInput.click()"
-          >
-            <mat-icon
-              class="__icon"
-            >
-              upload
-            </mat-icon>
-            <div class="__label">Upload Image</div>
-          </div>
-
-          <!-- OBJECT FRAME -->
-          <fbn-object-frame
-            *ngFor="let objectData of visualObjects; trackBy:identify"
-            [objectData]="objectData"
-          >
-          </fbn-object-frame>
-        </div>
-      </div>
+      <fbn-image-viewer
+        [isLoading]="(isLoading$ | async) || true"
+        [imgUrl]="imgUrl"
+        [objectDetections]="(objectDetections$ | async) || []"
+        (clickPlaceholder)="imgInput.click()"
+      >
+      </fbn-image-viewer>
     </div>
   </div>
 </div>

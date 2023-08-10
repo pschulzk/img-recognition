@@ -10,23 +10,23 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { AppComponent } from './app.component'
-import { ObjectFrameComponent } from './components/object-frame/object-frame.component'
+import { ImageViewerComponent } from './components/image-viewer/image-viewer.component'
 import { ImageRecognitionService } from './services/image-recognition/image-recognition.service'
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        NoopAnimationsModule,
         HttpClientTestingModule,
+        ImageViewerComponent,
         MatButtonModule,
         MatDialogModule,
         MatIconModule,
         MatProgressSpinnerModule,
         MatSlideToggleModule,
         MatToolbarModule,
+        NoopAnimationsModule,
         OverlayModule,
-        ObjectFrameComponent,
       ],
       declarations: [AppComponent],
       providers: [ChangeDetectorRef, ImageRecognitionService, OverlayModule],

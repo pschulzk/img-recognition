@@ -1,13 +1,12 @@
 import { OverlayContainer } from '@angular/cdk/overlay'
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
 import { MatSlideToggleChange } from '@angular/material/slide-toggle'
-import { ColorUtils, FbnImageRecognitionDetection, FbnImageRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
+import { FbnImageRecognitionDetection, FbnImageRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
 import { BehaviorSubject, finalize } from 'rxjs'
-import { ImageRecognitionService } from './services/image-recognition/image-recognition.service'
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
 import { DialogComponent } from './components/dialog/dialog.component'
-import { VisualObjectData } from './components/object-frame/object-frame.component'
+import { ImageRecognitionService } from './services/image-recognition/image-recognition.service'
 
 @UntilDestroy()
 @Component({
@@ -20,13 +19,9 @@ import { VisualObjectData } from './components/object-frame/object-frame.compone
 export class AppComponent implements OnInit {
   isLoading$ = new BehaviorSubject<boolean>(false)
 
-  imgUrl?: string 
+  imgUrl?: string
 
-  visualObjects: VisualObjectData[] = []
-
-  @ViewChild('userImage', { static: false, read: ElementRef }) userImage?: ElementRef<HTMLImageElement>
-  imageWidth?: number
-  imageHeight?: number
+  objectDetections$ = new BehaviorSubject<FbnImageRecognitionDetection[]>([])
 
   errorRemoteServiceUnavailable$ = new BehaviorSubject<boolean>(false)
   errorHasNoPredictions$ = new BehaviorSubject<boolean>(false)
@@ -48,10 +43,6 @@ export class AppComponent implements OnInit {
       this.errorRemoteServiceUnavailable$.next(!isHealthy)
       this.cd.detectChanges()
     })
-  }
-
-  identify(index: number, item: VisualObjectData) {
-    return String(item.data.confidence)
   }
 
   imgInputChange(fileInputEvent: Event) {
@@ -84,73 +75,19 @@ export class AppComponent implements OnInit {
           return
         }
         this.errorHasNoPredictions$.next(false)
-
-        if (!this.userImage?.nativeElement) {
-          throw new Error('No image element')
-        }
-        const { imageWidth, imageHeight } = this.getContainedSize(this.userImage.nativeElement)
-        this.imageWidth = imageWidth
-        this.imageHeight = imageHeight
-
-        this.visualObjects = this.sortByDistanceFromCenter(res.detections).map((detection) => ({
-          data: detection,
-          width: detection.box.w * imageWidth,
-          height: detection.box.h * imageHeight,
-          left: (detection.box.x * imageWidth) - ((detection.box.w * imageWidth) / 2),
-          bottom: imageHeight - ((detection.box.y * imageHeight) + (detection.box.h * imageHeight) / 2),
-          color: ColorUtils.getRandomBrightColor(),
-          // if confidence is low than make less visible
-          opacity: detection.confidence < 0.8 ? 0.4 : 1,
-        }))
+        this.objectDetections$.next(res.detections)
       }
     )
   }
 
-  getContainedSize(img: HTMLImageElement): { imageWidth: number, imageHeight: number } {
-    const ratio = img.naturalWidth/img.naturalHeight
-    let imageWidth = img.height * ratio
-    let imageHeight = img.height
-    if (imageWidth > img.width) {
-      imageWidth = img.width
-      imageHeight = img.width/ratio
-    }
-    return { imageWidth, imageHeight }
-  }
-
   reset() {
     this.imgUrl = undefined
-    this.visualObjects = []
+    this.objectDetections$.next([])
     this.errorHasNoPredictions$.next(false)
   }
 
   themeToggleChange(event: MatSlideToggleChange) {
     this.isDarkTheme = event.checked
-  }
-
-  private getDistanceFromCenter(item: FbnImageRecognitionDetection): number {
-    // Calculate the center of the item
-    const itemCenterX = item.box.x + item.box.w / 2
-    const itemCenterY = item.box.y + item.box.h / 2
-  
-    // Assuming the image grid's center is at (imageGridCenterX, imageGridCenterY)
-    const imageGridCenterX = 0 // Replace with the actual center X-coordinate of the image grid
-    const imageGridCenterY = 0 // Replace with the actual center Y-coordinate of the image grid
-  
-    // Calculate the distance from the image grid's center
-    const distanceX = Math.abs(itemCenterX - imageGridCenterX)
-    const distanceY = Math.abs(itemCenterY - imageGridCenterY)
-  
-    // Use Euclidean distance formula to get the total distance
-    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY)
-    return distance
-  }
-  
-  private sortByDistanceFromCenter(items: FbnImageRecognitionDetection[]): FbnImageRecognitionDetection[] {
-    return items.sort((a, b) => {
-      const distanceA = this.getDistanceFromCenter(a)
-      const distanceB = this.getDistanceFromCenter(b)
-      return distanceA - distanceB
-    })
   }
 
   openDialog() {

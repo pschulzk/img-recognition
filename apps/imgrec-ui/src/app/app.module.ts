@@ -12,6 +12,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { AppComponent } from './app.component'
 import { DialogComponent } from './components/dialog/dialog.component'
 import { ObjectFrameComponent } from './components/object-frame/object-frame.component'
+import { ImageViewerComponent } from './components/image-viewer/image-viewer.component'
 
 @NgModule({
   declarations: [AppComponent, DialogComponent],
@@ -28,6 +29,7 @@ import { ObjectFrameComponent } from './components/object-frame/object-frame.com
     OverlayModule,
 
     // standalone components:
+    ImageViewerComponent,
     ObjectFrameComponent,
   ],
   bootstrap: [AppComponent],

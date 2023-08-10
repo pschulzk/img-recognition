@@ -1,0 +1,38 @@
+<div class="img-container">
+  <!-- USER UPLOADED IMG -->
+  <img
+    *ngIf="imgUrl"
+    #userImage
+    @rowCollapseAnimation
+    [class.--loading]="isLoading"
+    [src]="imgUrl"
+    alt="your uploaded image"
+  >
+
+  <div
+    class="img-overlay"
+    [style.width.px]="imageWidth"
+    [style.height.px]="imageHeight"
+  >
+    <!-- PLACEHOLDER -->
+    <div
+      *ngIf="!(imgUrl$ | async) || !isLoading" class="user-image-placeholder"
+      @rowCollapseAnimation
+      (click)="clickPlaceholder.emit()"
+    >
+      <mat-icon
+        class="__icon"
+      >
+        upload
+      </mat-icon>
+      <div class="__label">Upload Image</div>
+    </div>
+
+    <!-- OBJECT FRAME -->
+    <fbn-object-frame
+      *ngFor="let objectData of visualObjects; trackBy:identify"
+      [objectData]="objectData"
+    >
+    </fbn-object-frame>
+  </div>
+</div>
