@@ -8,7 +8,7 @@ import { Observable, catchError, map, of, throwError } from 'rxjs'
 })
 export class ImageRecognitionService {
 
-  apiEndPoint = '/predict'
+  apiEndPoint = '/object-detection-service-api'
 
   constructor(
     private http: HttpClient,
@@ -32,7 +32,7 @@ export class ImageRecognitionService {
     headers.append('Content-Type', 'multipart/form-data')
     headers.append('Accept', 'application/json')
 
-    return this.http.post(`${this.apiEndPoint}`, formData, { headers }).pipe(
+    return this.http.post(`${this.apiEndPoint}/predict`, formData, { headers }).pipe(
       map(res => JSON.parse(JSON.stringify(res))),
       catchError(error => throwError(() => error)),
     )

@@ -4,8 +4,9 @@
     "secure": false,
     "changeOrigin": true
   },
-  "/predict": {
+  "/object-detection-service/*": {
     "target": "http://localhost:8000",
+    "pathRewrite": { "^/object-detection-service-api" : "" },
     "secure": false,
     "changeOrigin": true
   }  
