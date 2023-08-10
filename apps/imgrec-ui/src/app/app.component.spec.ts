@@ -1,27 +1,44 @@
-import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
-import { NxWelcomeComponent } from './nx-welcome.component';
+import { OverlayModule } from '@angular/cdk/overlay'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { ChangeDetectorRef } from '@angular/core'
+import { TestBed } from '@angular/core/testing'
+import { MatButtonModule } from '@angular/material/button'
+import { MatDialogModule } from '@angular/material/dialog'
+import { MatIconModule } from '@angular/material/icon'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
+import { MatToolbarModule } from '@angular/material/toolbar'
+import { NoopAnimationsModule } from '@angular/platform-browser/animations'
+import { AppComponent } from './app.component'
+import { ObjectFrameComponent } from './components/object-frame/object-frame.component'
+import { ImageRecognitionService } from './services/image-recognition/image-recognition.service'
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [],
-      declarations: [AppComponent, NxWelcomeComponent],
-    }).compileComponents();
-  });
+      imports: [
+        NoopAnimationsModule,
+        HttpClientTestingModule,
+        MatButtonModule,
+        MatDialogModule,
+        MatIconModule,
+        MatProgressSpinnerModule,
+        MatSlideToggleModule,
+        MatToolbarModule,
+        OverlayModule,
+        ObjectFrameComponent,
+      ],
+      declarations: [AppComponent],
+      providers: [ChangeDetectorRef, ImageRecognitionService, OverlayModule],
+    }).compileComponents()
+  })
 
   it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain(
-      'Welcome imgrec-ui'
-    );
-  });
-
-  it(`should have as title 'imgrec-ui'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('imgrec-ui');
-  });
-});
+    const fixture = TestBed.createComponent(AppComponent)
+    fixture.detectChanges()
+    const compiled = fixture.nativeElement as HTMLElement
+    expect(compiled.querySelector('.title')?.textContent).toContain(
+      'Image Recognition'
+    )
+  })
+})
