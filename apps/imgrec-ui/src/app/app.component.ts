@@ -1,5 +1,5 @@
 import { OverlayContainer } from '@angular/cdk/overlay'
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { MatSlideToggleChange } from '@angular/material/slide-toggle'
 import { ColorUtils, FbnImageRecognitionDetection, FbnImageRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
@@ -17,7 +17,7 @@ import { VisualObjectData } from './components/object-frame/object-frame.compone
   animations: [rowCollapseAnimation],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   isLoading$ = new BehaviorSubject<boolean>(false)
 
   imgUrl?: string 
@@ -28,6 +28,7 @@ export class AppComponent {
   imageWidth?: number
   imageHeight?: number
 
+  errorRemoteServiceUnavailable$ = new BehaviorSubject<boolean>(false)
   errorHasNoPredictions$ = new BehaviorSubject<boolean>(false)
 
   isDarkTheme = true
@@ -38,6 +39,16 @@ export class AppComponent {
     private cd: ChangeDetectorRef,
     private dialog: MatDialog,
   ) { }
+
+  ngOnInit(): void {
+    // check if remote service is available
+    this.imageRecognitionService.getIsHealthy().pipe(
+      untilDestroyed(this),
+    ).subscribe((isHealthy) => {
+      this.errorRemoteServiceUnavailable$.next(!isHealthy)
+      this.cd.detectChanges()
+    })
+  }
 
   identify(index: number, item: VisualObjectData) {
     return String(item.data.confidence)

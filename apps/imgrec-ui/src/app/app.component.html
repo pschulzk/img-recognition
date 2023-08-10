@@ -68,11 +68,19 @@
       <br>
 
       <p
+        *ngIf="errorRemoteServiceUnavailable$ | async"
+        @rowCollapseAnimation
+        class="mat-error"
+      >
+        ERROR: Remote service is currently not available. Please try again later.
+      </p>
+
+      <p
         *ngIf="errorHasNoPredictions$ | async"
         @rowCollapseAnimation
         class="mat-error"
       >
-        No detections available. Please try again or try another image.
+        ERROR: No objects could be identified. Please try again or try another image.
       </p>
 
       <div class="img-container">
