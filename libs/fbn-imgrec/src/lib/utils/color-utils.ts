@@ -37,12 +37,14 @@ export class ColorUtils {
     // Calculate color brightness (perceived luminance)
     let brightness = ColorUtils.calculateBrightness(rgbColor)
   
-    // Increase brightness if the color is too dark (brightness < 0.7)
-    while (brightness < 0.7) {
-      // You can adjust the factor to control how much brighter the colors will be.
+    const maxIterations = 10 // Set a maximum number of iterations
+    let iterations = 0
+    
+    while (brightness < 0.7 && iterations < maxIterations) {
       color = ColorUtils.adjustBrightness(color, 1.2) // Increase brightness by 20%
       rgbColor = ColorUtils.hexToRgb(color)
       brightness = ColorUtils.calculateBrightness(rgbColor)
+      iterations++
     }
   
     return color
