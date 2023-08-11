@@ -44,6 +44,8 @@ export class ImageViewerComponent implements OnChanges {
 
   visualObjects: VisualObjectData[] = []
 
+  elementIsHovered = false
+
   constructor(
     private cd: ChangeDetectorRef,
   ) { }
