@@ -84,8 +84,7 @@
 
       <fbn-image-viewer
         [isLoading]="(isLoading$ | async) || true"
-        [imgUrl]="imgUrl"
-        [objectDetections]="(objectDetections$ | async) || []"
+        [config]="imageViewerConfig"
         (clickPlaceholder)="imgInput.click()"
       >
       </fbn-image-viewer>

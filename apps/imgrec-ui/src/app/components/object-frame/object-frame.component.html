@@ -1,19 +1,30 @@
 <div
-    *ngIf="objectData"
-    class="object-frame"
-    [style.left.px]="objectData.left"
-    [style.bottom.px]="objectData.bottom"
-    [style.width.px]="objectData.width"
-    [style.height.px]="objectData.height"
-    [style.border-color]="objectData.color"
-    [style.opacity]="objectData.opacity"
-    @rowCollapseAnimation
+  *ngIf="objectData"class="object-frame-container"
+  [style.left.px]="objectData.left"
+  [style.bottom.px]="objectData.bottom"
+  [style.width.px]="objectData.width"
+  [style.height.px]="objectData.height"
+  [style.border-color]="objectData.color"
+  [style.opacity]="objectData.opacity"
+  @rowCollapseAnimation
 >
-  <div class="__object-label" [style.background-color]="objectData.color">
-    <b>{{ objectData.data.class_name }}</b>
-  </div>
+  <div
+      class="object-frame"
+      [style.width.px]="objectData.width"
+      [style.height.px]="objectData.height"
+      [style.color]="objectData.color"
+  >
+    <div class="__object-label" [style.background-color]="objectData.color">
+      <b>{{ objectData.data.class_name }}</b>
+    </div>
 
-  <div class="__object-data" [style.background-color]="objectData.color">
-    <b>Confidence</b>: <span class="confidence">{{ objectData.data.confidence | json }}</span>
+    <canvas
+      #objectCanvas
+      class="__object-canvas"
+    ></canvas>
+
+    <div class="__object-data" [style.background-color]="objectData.color">
+      <b>Confidence</b>: <span class="confidence">{{ objectData.data.confidence | json }}</span>
+    </div>
   </div>
 </div>

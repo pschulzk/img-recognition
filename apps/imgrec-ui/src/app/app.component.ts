@@ -4,8 +4,9 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
 import { MatSlideToggleChange } from '@angular/material/slide-toggle'
 import { FbnImageRecognitionDetection, FbnImageRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
-import { BehaviorSubject, finalize } from 'rxjs'
+import { BehaviorSubject, combineLatest, finalize } from 'rxjs'
 import { DialogComponent } from './components/dialog/dialog.component'
+import { ImageViewerConfig } from './components/image-viewer/image-viewer.component'
 import { ImageRecognitionService } from './services/image-recognition/image-recognition.service'
 
 @UntilDestroy()
@@ -19,9 +20,10 @@ import { ImageRecognitionService } from './services/image-recognition/image-reco
 export class AppComponent implements OnInit {
   isLoading$ = new BehaviorSubject<boolean>(false)
 
-  imgUrl?: string
-
+  imgUrl$ = new BehaviorSubject<string | undefined>(undefined)
+  imageInstance$ = new BehaviorSubject<HTMLImageElement | undefined>(undefined)
   objectDetections$ = new BehaviorSubject<FbnImageRecognitionDetection[]>([])
+  imageViewerConfig?: ImageViewerConfig<FbnImageRecognitionDetection>
 
   errorRemoteServiceUnavailable$ = new BehaviorSubject<boolean>(false)
   errorHasNoPredictions$ = new BehaviorSubject<boolean>(false)
@@ -31,8 +33,8 @@ export class AppComponent implements OnInit {
   constructor(
     private imageRecognitionService: ImageRecognitionService,
     private overlay: OverlayContainer,
-    private cd: ChangeDetectorRef,
     private dialog: MatDialog,
+    private cd: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -41,6 +43,21 @@ export class AppComponent implements OnInit {
       untilDestroyed(this),
     ).subscribe((isHealthy) => {
       this.errorRemoteServiceUnavailable$.next(!isHealthy)
+      this.cd.detectChanges()
+    })
+
+    combineLatest([
+      this.imgUrl$.asObservable(),
+      this.imageInstance$.asObservable(),
+      this.objectDetections$.asObservable(),
+    ]).pipe(
+      untilDestroyed(this),
+    ).subscribe(([imgUrl, originalImageInstance, objectDetections]) => {
+      this.imageViewerConfig = {
+        imgUrl,
+        imageInstance: originalImageInstance,
+        objectDetections,
+      }
       this.cd.detectChanges()
     })
   }
@@ -59,8 +76,12 @@ export class AppComponent implements OnInit {
     const reader = new FileReader()
     reader.readAsDataURL(uploadedImageFile) 
     reader.onload = () => { 
-      this.imgUrl = reader.result as string
-      this.cd.detectChanges()
+      this.imgUrl$.next(reader.result as string)
+      const img = new Image()
+      img.src = reader.result as string
+      img.onload = () => {
+        this.imageInstance$.next(img)
+      }
     }
 
     // request image recognition meta  data
@@ -81,7 +102,7 @@ export class AppComponent implements OnInit {
   }
 
   reset() {
-    this.imgUrl = undefined
+    this.imgUrl$.next(undefined)
     this.objectDetections$.next([])
     this.errorHasNoPredictions$.next(false)
   }

@@ -1,10 +1,22 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChange, ViewChild } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { ColorUtils, FbnImageRecognitionDetection, rowCollapseAnimation } from '@fbn/fbn-imgrec'
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
-import { BehaviorSubject, combineLatest } from 'rxjs'
+import { UntilDestroy } from '@ngneat/until-destroy'
 import { ObjectFrameComponent, VisualObjectData } from '../object-frame/object-frame.component'
+
+export interface ImageViewerConfig<T> {
+  /** base64 encoded image URL */
+  imgUrl: string | undefined
+  /** instantiated `Image` not embedded in DOM with original `width` and `height` */
+  imageInstance: HTMLImageElement | undefined
+  /** width of the image in DOM */
+  computedImageWidth?: number
+  /** height of the image in DOM */
+  computedImageHeight?: number
+  /** list of detected objects in image */
+  objectDetections: T[]
+}
 
 @UntilDestroy()
 @Component({
@@ -20,80 +32,65 @@ import { ObjectFrameComponent, VisualObjectData } from '../object-frame/object-f
     ObjectFrameComponent,
   ],
 })
-export class ImageViewerComponent implements OnInit {
+export class ImageViewerComponent implements OnChanges {
 
   @Input() isLoading = false
 
-  @Input() set imgUrl(value: string | undefined) {
-    this.imgUrl$.next(value)
-  }
-  get imgUrl(): string | undefined {
-    return this.imgUrl$.getValue()
-  }
-  imgUrl$ = new BehaviorSubject<string | undefined>(undefined)
-  @Input() set objectDetections(value: FbnImageRecognitionDetection[]) {
-    this.objectDetections$.next(value)
-  }
-  get objectDetections(): FbnImageRecognitionDetection[] {
-    return this.objectDetections$.getValue()
-  }
-  objectDetections$ = new BehaviorSubject<FbnImageRecognitionDetection[]>([])
+  @Input() config?: ImageViewerConfig<FbnImageRecognitionDetection>
 
   @Output() clickPlaceholder = new EventEmitter<void>()
   
-  imageWidth?: number
-  imageHeight?: number
-
-  visualObjects: VisualObjectData[] = []
-  
   @ViewChild('userImage', { static: false, read: ElementRef }) userImage?: ElementRef<HTMLImageElement>
 
-  ngOnInit(): void {
-    // subscribe to both change because they do depend on each other
-    combineLatest([
-      this.objectDetections$.asObservable(),
-      this.imgUrl$.asObservable(),
-    ]).pipe(
-      untilDestroyed(this),
-    ).subscribe(([objectDetections]) => {
+  visualObjects: VisualObjectData[] = []
 
+  constructor(
+    private cd: ChangeDetectorRef,
+  ) { }
+
+  ngOnChanges(changes: {
+    [key in keyof this]: SimpleChange
+  }): void {
+    if (changes.config?.previousValue !== changes.config?.currentValue && this.config) {
+      // reset value
       this.visualObjects = []
 
       if (!this.userImage?.nativeElement) {
         return
       }
-      const { imageWidth, imageHeight } = this.getContainedSize(this.userImage.nativeElement)
-      this.imageWidth = imageWidth
-      this.imageHeight = imageHeight
+      const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userImage.nativeElement)
+      this.config.computedImageWidth = computedImageWidth
+      this.config.computedImageHeight = computedImageHeight
 
-      this.visualObjects = this.sortByDistanceFromCenter(objectDetections).map((detection) => {
+      this.visualObjects = this.sortByDistanceFromCenter(this.config.objectDetections).map((detection) => {
         return {
           data: detection,
-          width: detection.box.w * imageWidth,
-          height: detection.box.h * imageHeight,
-          left: (detection.box.x * imageWidth) - ((detection.box.w * imageWidth) / 2),
-          bottom: imageHeight - ((detection.box.y * imageHeight) + (detection.box.h * imageHeight) / 2),
+          width: detection.box.w * computedImageWidth,
+          height: detection.box.h * computedImageHeight,
+          left: (detection.box.x * computedImageWidth) - ((detection.box.w * computedImageWidth) / 2),
+          bottom: computedImageHeight - ((detection.box.y * computedImageHeight) + (detection.box.h * computedImageHeight) / 2),
           color: ColorUtils.getRandomBrightColor(),
           // if confidence is low than make less visible
           opacity: detection.confidence < 0.8 ? 0.4 : 1,
         }
       })
-    })
+      this.cd.detectChanges()
+    }
   }
 
   identify(index: number, item: VisualObjectData) {
     return String(item.data.confidence)
   }
 
-  getContainedSize(img: HTMLImageElement): { imageWidth: number, imageHeight: number } {
+  getContainedSize(img: HTMLImageElement): { computedImageWidth: number, computedImageHeight: number } {
     const ratio = img.naturalWidth/img.naturalHeight
-    let imageWidth = img.height * ratio
-    let imageHeight = img.height
-    if (imageWidth > img.width) {
-      imageWidth = img.width
-      imageHeight = img.width/ratio
+    let computedImageWidth = img.height * ratio
+    let computedImageHeight = img.height
+    if (computedImageWidth > img.width) {
+      computedImageWidth = img.width
+      computedImageHeight = img.width/ratio
     }
-    return { imageWidth, imageHeight }
+    return { computedImageWidth, computedImageHeight }
   }
 
   private getDistanceFromCenter(item: FbnImageRecognitionDetection): number {

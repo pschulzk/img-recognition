@@ -1,22 +1,22 @@
 <div class="img-container">
   <!-- USER UPLOADED IMG -->
   <img
-    *ngIf="imgUrl"
+    *ngIf="config?.imgUrl"
     #userImage
     @rowCollapseAnimation
     [class.--loading]="isLoading"
-    [src]="imgUrl"
+    [src]="config?.imgUrl"
     alt="your uploaded image"
   >
 
   <div
     class="img-overlay"
-    [style.width.px]="imageWidth"
-    [style.height.px]="imageHeight"
+    [style.width.px]="config?.computedImageWidth"
+    [style.height.px]="config?.computedImageHeight"
   >
     <!-- PLACEHOLDER -->
     <div
-      *ngIf="!(imgUrl$ | async) || !isLoading" class="user-image-placeholder"
+      *ngIf="!config?.imgUrl || !isLoading" class="user-image-placeholder"
       @rowCollapseAnimation
       (click)="clickPlaceholder.emit()"
     >
@@ -32,6 +32,10 @@
     <fbn-object-frame
       *ngFor="let objectData of visualObjects; trackBy:identify"
       [objectData]="objectData"
+      [imageInstance]="config?.imageInstance"
+      [imageDomElementRef]="userImage"
+      [computedImageWidth]="config?.computedImageWidth"
+      [computedImageHeight]="config?.computedImageHeight"
     >
     </fbn-object-frame>
   </div>
