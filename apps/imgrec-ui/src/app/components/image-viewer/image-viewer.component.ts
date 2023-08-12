@@ -86,7 +86,7 @@ export class ImageViewerComponent implements OnChanges {
     return String(item.data.confidence)
   }
 
-  enlarge(objectData: VisualObjectData): void {
+  toggleEnlarge(objectData: VisualObjectData): void {
     if (!this.userImage?.nativeElement || !this.config?.imageInstance) {
       return
     }
