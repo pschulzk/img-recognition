@@ -1,3 +1,10 @@
+<!-- if object frame is enlarged block all other object frames -->
+<div
+  class="inner-overlay"
+  [class.--active]="objectData?.enlarged"
+>
+</div>
+
 <div
   *ngIf="objectData"class="object-frame-container"
   [class.--enlarged]="objectData.enlarged"
