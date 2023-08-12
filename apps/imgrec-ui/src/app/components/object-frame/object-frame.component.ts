@@ -10,6 +10,7 @@ export interface VisualObjectData {
   bottom: number
   color: string
   opacity: number
+  enlarged: boolean
 }
 
 @Component({

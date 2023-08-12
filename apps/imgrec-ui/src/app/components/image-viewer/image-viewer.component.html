@@ -5,7 +5,7 @@
     #userImage
     @rowCollapseAnimation
     [class.--loading]="isLoading"
-    [class.--blur]="elementIsHovered"
+    [class.--blur]="objectFrameIsHovered || objectFrameIsEnlarged"
     [src]="config?.imgUrl"
     alt="your uploaded image"
   >
@@ -37,8 +37,9 @@
       [imageDomElementRef]="userImage"
       [computedImageWidth]="config?.computedImageWidth"
       [computedImageHeight]="config?.computedImageHeight"
-      (mouseover)="elementIsHovered = true"
-      (mouseleave)="elementIsHovered = false"
+      (mouseover)="objectFrameIsHovered = true"
+      (mouseleave)="objectFrameIsHovered = false"
+      (click)="enlarge(objectData)"
     >
     </fbn-object-frame>
   </div>

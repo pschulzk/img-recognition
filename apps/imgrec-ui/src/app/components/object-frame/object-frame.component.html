@@ -1,5 +1,6 @@
 <div
   *ngIf="objectData"class="object-frame-container"
+  [class.--enlarged]="objectData.enlarged"
   [style.left.px]="objectData.left"
   [style.bottom.px]="objectData.bottom"
   [style.width.px]="objectData.width"
@@ -21,6 +22,7 @@
     <canvas
       #objectCanvas
       class="__object-canvas"
+      [class.--enlarged]="objectData.enlarged"
     ></canvas>
 
     <div class="__object-data" [style.background-color]="objectData.color">

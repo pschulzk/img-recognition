@@ -44,7 +44,8 @@ export class ImageViewerComponent implements OnChanges {
 
   visualObjects: VisualObjectData[] = []
 
-  elementIsHovered = false
+  objectFrameIsHovered = false
+  objectFrameIsEnlarged = false
 
   constructor(
     private cd: ChangeDetectorRef,
@@ -74,6 +75,7 @@ export class ImageViewerComponent implements OnChanges {
           color: ColorUtils.getRandomBrightColor(),
           // if confidence is low than make less visible
           opacity: detection.confidence < 0.8 ? 0.4 : 1,
+          enlarged: false,
         }
       })
       this.cd.detectChanges()
@@ -84,7 +86,58 @@ export class ImageViewerComponent implements OnChanges {
     return String(item.data.confidence)
   }
 
-  getContainedSize(img: HTMLImageElement): { computedImageWidth: number, computedImageHeight: number } {
+  enlarge(objectData: VisualObjectData): void {
+    if (!this.userImage?.nativeElement || !this.config?.imageInstance) {
+      return
+    }
+  
+    const isLandscape = objectData.width > objectData.height
+    const widthHeightDifference = Math.abs(objectData.width - objectData.height)
+    const isNearlySquare = widthHeightDifference < 40
+    const margin = isNearlySquare ? 200 : 50 // Constant margin in pixels
+    const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userImage.nativeElement)
+  
+    if (objectData.enlarged) {
+      // revert to original size
+      objectData.width = objectData.data.box.w * computedImageWidth
+      objectData.height = objectData.data.box.h * computedImageHeight
+      objectData.left = (objectData.data.box.x * computedImageWidth) - ((objectData.data.box.w * computedImageWidth) / 2)
+      objectData.bottom = computedImageHeight - ((objectData.data.box.y * computedImageHeight) + (objectData.data.box.h * computedImageHeight) / 2)
+      objectData.enlarged = false
+      this.objectFrameIsEnlarged = false
+    } else {
+      if (isLandscape) {
+        // get factor of how much computedImageWidth is larger than objectData.width
+        const ratio = (computedImageWidth - margin * 2) / objectData.width
+        const targetWidth = computedImageWidth - margin * 2
+        const targetHeight = objectData.height * ratio
+  
+        objectData.width = targetWidth
+        objectData.height = targetHeight
+        // Calculate centering for landscape frames
+        objectData.left = (computedImageWidth - targetWidth) / 2
+        objectData.bottom = (computedImageHeight - targetHeight) / 2
+      } else {
+        // get factor of how much computedImageHeight is larger than objectData.height
+        const ratio = (computedImageHeight - margin * 2) / objectData.height
+        const targetHeight = computedImageHeight - margin * 2
+        const targetWidth = objectData.width * ratio
+  
+        objectData.width = targetWidth
+        objectData.height = targetHeight
+        // Center horizontally and vertically for portrait frames
+        objectData.left = (computedImageWidth - targetWidth) / 2
+        objectData.bottom = (computedImageHeight - targetHeight) / 2
+      }
+      objectData.enlarged = true
+      this.objectFrameIsEnlarged = true
+    }
+  
+    this.cd.detectChanges()
+  }
+  
+
+  private getContainedSize(img: HTMLImageElement): { computedImageWidth: number, computedImageHeight: number } {
     const ratio = img.naturalWidth/img.naturalHeight
     let computedImageWidth = img.height * ratio
     let computedImageHeight = img.height

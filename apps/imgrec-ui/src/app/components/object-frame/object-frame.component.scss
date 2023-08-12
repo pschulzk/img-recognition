@@ -1,7 +1,13 @@
 .object-frame-container {
   position: absolute;
-  transition: box-shadow 0.2s ease-in-out;
+  transition:
+    box-shadow 0.2s ease-in-out;
   box-shadow: 0 0 1.5rem rgba(black, 1);
+
+  &.--enlarged {
+    z-index: 2;
+    opacity: 1 !important;
+  }
 
   &:hover {
     z-index: 1;
@@ -39,6 +45,10 @@
     opacity: 0;
     transition: opacity 0.1s;
     transition-delay: 0.1s;
+
+    &.--enlarged {
+      opacity: 1;
+    }
   }
 
   & .__object-data {
