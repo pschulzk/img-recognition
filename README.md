@@ -41,17 +41,17 @@ docker-compose up -d
 
 In another CLI instance, run frontend app for Single Image Recognition:
 ```
-npm run serve-imgrec-ui
+npm run imgrec-ui:dev
 ```
 
 ## How tun run Image Recognition for Video
 
 Run backend app for Image Recognition for Video API:
 ```
-npm run serve-movrec-api
+npm run movrec-api:dev
 ```
 
 In another CLI instance, run frontend app for Image Recognition for Video:
 ```
-npm run serve-movrec-ui
+npm run movrec-ui:dev
 ```
