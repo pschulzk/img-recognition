@@ -8,15 +8,26 @@
     <span class="spacer"></span>
     <div class="flex-stretch"></div>
 
-    <!-- UPLOAD -->
-    <input #imgInput hidden="true" type="file" onclick="this.value=null" (change)="imgInputChange($event)" accept=".jpg"/>
+    <!-- UPLOAD IMAGE -->
+    <input #imageInput hidden="true" type="file" onclick="this.value=null" (change)="imageInputChange($event)" accept=".jpg"/>
     <button
       mat-raised-button
       color="primary"
-      (click)="imgInput.click()"
+      (click)="imageInput.click()"
     >
       <mat-icon>upload</mat-icon>
       Upload Image
+    </button>
+
+    <!-- UPLOAD VIDEO -->
+    <input #videoInput hidden="true" type="file" onclick="this.value=null" (change)="videoInputChange($event)" accept=".mp4"/>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="videoInput.click()"
+    >
+      <mat-icon>upload</mat-icon>
+      Upload Video
     </button>
 
     <!-- RESET -->
@@ -83,11 +94,20 @@
       </p>
 
       <fbn-image-viewer
-        [isLoading]="(isLoading$ | async) || true"
+        *ngIf="imageUrl$ | async"
+        [isLoading]="(isLoading$ | async) || false"
         [config]="imageViewerConfig"
-        (clickPlaceholder)="imgInput.click()"
+        (clickPlaceholder)="imageInput.click()"
       >
       </fbn-image-viewer>
+
+      <fbn-video-viewer
+        *ngIf="videoUrl$ | async"
+        [isLoading]="(isLoading$ | async) || false"
+        [config]="videoViewerConfig"
+        (clickPlaceholder)="videoInput.click()"
+      >
+      </fbn-video-viewer>
     </div>
   </div>
 </div>

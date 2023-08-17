@@ -11,7 +11,7 @@ import { MatToolbarModule } from '@angular/material/toolbar'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { AppComponent } from './app.component'
 import { ImageViewerComponent } from './components/image-viewer/image-viewer.component'
-import { ImageRecognitionService } from './services/image-recognition/image-recognition.service'
+import { OjectDetectionService } from './services/image-recognition/image-recognition.service'
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -29,7 +29,7 @@ describe('AppComponent', () => {
         OverlayModule,
       ],
       declarations: [AppComponent],
-      providers: [ChangeDetectorRef, ImageRecognitionService, OverlayModule],
+      providers: [ChangeDetectorRef, OjectDetectionService, OverlayModule],
     }).compileComponents()
   })
 

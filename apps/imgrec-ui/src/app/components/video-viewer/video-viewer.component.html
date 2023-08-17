@@ -2,16 +2,20 @@
   class="img-container"
   [class.--loading]="isLoading"
 >
-  <!-- USER UPLOADED IMG -->
-  <img
-    *ngIf="config?.imageUrl"
-    #userImage
-    @rowCollapseAnimation
-    [class.--loading]="isLoading"
-    [class.--blur]="objectFrameIsHovered || objectFrameIsEnlarged"
-    [src]="config?.imageUrl"
-    alt="your uploaded image"
+
+  <!-- USER UPLOADED VIDEO -->
+  <video
+    *ngIf="config?.videoUrl"
+    #userVideo
+    [hidden]="isLoading"
+    [muted]="true"
+    autoplay
+    loop
+    width="100%"
+    controls
   >
+    <source [src]="config?.videoUrl" type="video/mp4">
+  </video>
 
   <div
     class="img-overlay"
@@ -20,7 +24,7 @@
   >
     <!-- PLACEHOLDER -->
     <!-- <div
-      *ngIf="!config?.imageUrl || !isLoading" class="user-image-placeholder"
+      *ngIf="!config?.videoUrl || !isLoading" class="user-image-placeholder"
       @rowCollapseAnimation
       (click)="clickPlaceholder.emit()"
     >
@@ -36,8 +40,8 @@
     <fbn-object-frame
       *ngFor="let objectData of visualObjects; trackBy:identify"
       [objectData]="objectData"
-      [imageInstance]="config?.imageInstance"
-      [hasLoaded]="!!userImage"
+      [hasLoaded]="!!userVideo"
+      [videoInstance]="config?.videoInstance"
       [computedImageWidth]="config?.computedImageWidth"
       [computedImageHeight]="config?.computedImageHeight"
       (mouseover)="objectFrameIsHovered = true"

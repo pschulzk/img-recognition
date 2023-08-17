@@ -25,8 +25,9 @@ export interface VisualObjectData {
 export class ObjectFrameComponent implements OnChanges {
 
   @Input() objectData?: VisualObjectData
-  @Input() imageDomElementRef?: ElementRef<HTMLImageElement>
+  @Input() hasLoaded?: boolean = false
   @Input() imageInstance?: HTMLImageElement
+  @Input() videoInstance?: HTMLVideoElement
   @Input() computedImageWidth?: number
   @Input() computedImageHeight?: number
 
@@ -41,25 +42,30 @@ export class ObjectFrameComponent implements OnChanges {
   ngOnChanges(changes: {
     [key in keyof this]: SimpleChange
   }): void {
-    if (changes.objectData?.currentValue) {
+    if (changes.hasLoaded?.previousValue !== changes.hasLoaded?.currentValue || changes.objectData?.currentValue) {
       this.drawImageOnCanvas()
     }
   }
 
   drawImageOnCanvas(): void {
     this.cd.detectChanges()
-    if (this.imageDomElementRef && this.objectCanvas && this.objectData && this.computedImageWidth && this.computedImageHeight && this.imageInstance) {
+    if (this.hasLoaded && this.objectCanvas && this.objectData && this.computedImageWidth && this.computedImageHeight && (this.imageInstance || this.videoInstance)) {
 
       this.context = this.objectCanvas.nativeElement.getContext('2d')
       if (!this.context) {
         throw new Error('Could not get 2d context from canvas')
       }
+      const instanceWidth = this.imageInstance?.width || this.videoInstance?.videoWidth
+      const instanceHeight = this.imageInstance?.height || this.videoInstance?.videoHeight
+      if (!instanceWidth || !instanceHeight) {
+        throw new Error('Could not get instance width or height')
+      }
       
-      const scaleWidth = this.imageInstance.width / this.computedImageWidth
-      const scaleHeight = this.imageInstance.height / this.computedImageHeight
+      const scaleWidth = instanceWidth / this.computedImageWidth
+      const scaleHeight = instanceHeight / this.computedImageHeight
   
       const sourceX = this.objectData.left * scaleWidth
-      const sourceY = this.imageInstance.height - ((this.objectData.bottom + this.objectData.height) * scaleHeight)
+      const sourceY = instanceHeight - ((this.objectData.bottom + this.objectData.height) * scaleHeight)
       const sourceWidth = this.objectData.width * scaleWidth
       const sourceHeight = this.objectData.height * scaleHeight
   
@@ -75,12 +81,14 @@ export class ObjectFrameComponent implements OnChanges {
       // Clear the canvas before drawing
       this.context.clearRect(0, 0, destWidth, destHeight)
   
-      // Draw the image on the canvas
-      this.context.drawImage(
-        this.imageInstance, // The Image instance
-        sourceX, sourceY, sourceWidth, sourceHeight, // Source rectangle
-        destX, destY, destWidth, destHeight // Destination rectangle
-      )
+      if (this.imageInstance) {
+        // Draw the image on the canvas
+        this.context.drawImage(
+          this.imageInstance, // The Image instance
+          sourceX, sourceY, sourceWidth, sourceHeight, // Source rectangle
+          destX, destY, destWidth, destHeight // Destination rectangle
+        )
+      }
       this.cd.detectChanges()
     }
   }

@@ -1,28 +1,28 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChange, ViewChild } from '@angular/core'
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChange, ViewChild } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
-import { ColorUtils, FbnImageRecognitionDetection, rowCollapseAnimation } from '@fbn/fbn-imgrec'
+import { ColorUtils, FbnImageRecognitionDetection, FbnVideoRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { ObjectFrameComponent, VisualObjectData } from '../object-frame/object-frame.component'
 
-export interface ImageViewerConfig {
+export interface VideoViewerConfig {
   /** base64 encoded image URL */
-  imageUrl: string | undefined
+  videoUrl: string | undefined
   /** instantiated `Image` not embedded in DOM with original `width` and `height` */
-  imageInstance: HTMLImageElement | undefined
+  videoInstance: HTMLVideoElement | undefined
   /** width of the image in DOM */
   computedImageWidth?: number
   /** height of the image in DOM */
   computedImageHeight?: number
   /** list of detected objects in image */
-  objectDetections: FbnImageRecognitionDetection[]
+  objectDetections: FbnVideoRecognitionResponse | undefined
 }
 
 @UntilDestroy()
 @Component({
-  selector: 'fbn-image-viewer',
-  templateUrl: './image-viewer.component.html',
-  styleUrls: ['./image-viewer.component.scss'],
+  selector: 'fbn-video-viewer',
+  templateUrl: './video-viewer.component.html',
+  styleUrls: ['./video-viewer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [rowCollapseAnimation],
   standalone: true,
@@ -32,15 +32,15 @@ export interface ImageViewerConfig {
     ObjectFrameComponent,
   ],
 })
-export class ImageViewerComponent implements OnChanges {
+export class VideoViewerComponent implements AfterViewInit, OnChanges {
 
   @Input() isLoading = false
 
-  @Input() config?: ImageViewerConfig
+  @Input() config?: VideoViewerConfig
 
   @Output() clickPlaceholder = new EventEmitter<void>()
   
-  @ViewChild('userImage', { static: false, read: ElementRef }) userImage?: ElementRef<HTMLImageElement>
+  @ViewChild('userVideo', { static: false, read: ElementRef }) userVideo?: ElementRef<HTMLVideoElement>
 
   visualObjects: VisualObjectData[] = []
 
@@ -51,6 +51,17 @@ export class ImageViewerComponent implements OnChanges {
     private cd: ChangeDetectorRef,
   ) { }
 
+  ngAfterViewInit(): void {
+    if (this.userVideo?.nativeElement && this.config) {
+      const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
+      this.config.computedImageWidth = computedImageWidth
+      this.config.computedImageHeight = computedImageHeight
+
+      this.userVideo.nativeElement.addEventListener('play', () => this.videoOnPlay())
+      console.log('!!! ngAfterViewInit', computedImageWidth, computedImageHeight)
+    }
+  }
+
   ngOnChanges(changes: {
     [key in keyof this]: SimpleChange
   }): void {
@@ -58,27 +69,13 @@ export class ImageViewerComponent implements OnChanges {
       // reset value
       this.visualObjects = []
 
-      if (!this.userImage?.nativeElement) {
+      if (!this.userVideo?.nativeElement) {
         return
       }
-      const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userImage.nativeElement)
+      const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
       this.config.computedImageWidth = computedImageWidth
       this.config.computedImageHeight = computedImageHeight
-
-      this.visualObjects = this.sortByDistanceFromCenter(this.config.objectDetections).map((detection) => {
-        return {
-          data: detection,
-          width: detection.box.w * computedImageWidth,
-          height: detection.box.h * computedImageHeight,
-          left: (detection.box.x * computedImageWidth) - ((detection.box.w * computedImageWidth) / 2),
-          bottom: computedImageHeight - ((detection.box.y * computedImageHeight) + (detection.box.h * computedImageHeight) / 2),
-          color: ColorUtils.getRandomBrightColor(),
-          // if confidence is low than make less visible
-          opacity: detection.confidence < 0.8 ? 0.4 : 1,
-          enlarged: false,
-        }
-      })
-      this.cd.detectChanges()
+      console.log('!!! ngOnChanges', computedImageWidth, computedImageHeight)
     }
   }
 
@@ -86,8 +83,52 @@ export class ImageViewerComponent implements OnChanges {
     return item.data.id
   }
 
+  videoOnPlay(): void {
+    if (this.userVideo) {
+      const video: HTMLVideoElement = this.userVideo.nativeElement
+      video.requestVideoFrameCallback((timestamp, videoFrameCallbackMetadata) => this.videoFrameCallback(timestamp, videoFrameCallbackMetadata, video))
+    }
+  }
+
+  videoFrameCallback(timestamp: DOMHighResTimeStamp, videoFrameCallbackMetadata: VideoFrameCallbackMetadata, videoElement: HTMLVideoElement) {
+    console.log('!!! this.visualObjects', this.visualObjects)
+    if (this.config && this.config.computedImageWidth && this.config.computedImageHeight) {
+      const computedImageWidth: number = this.config.computedImageWidth
+      const computedImageHeight: number = this.config.computedImageHeight
+      console.log(`timestamp: ${ timestamp } | frame: ${ JSON.stringify( videoFrameCallbackMetadata, null, 4 ) }`)
+  
+      // update state
+      const frameRate = this.config.videoInstance?.getVideoPlaybackQuality()?.droppedVideoFrames || 30
+      const currentFrameNumber = Math.round(videoFrameCallbackMetadata.mediaTime * frameRate)
+      if (this.config.objectDetections?.frames[currentFrameNumber]) {
+        const frameData = this.config.objectDetections?.frames[currentFrameNumber]
+        // check if the correct frame number
+        if (frameData.frameIndex === currentFrameNumber) {
+          // update visualization state
+          this.visualObjects = this.sortByDistanceFromCenter(frameData.detections).map((detection) => {
+            return {
+              data: detection,
+              width: detection.box.w * computedImageWidth,
+              height: detection.box.h * computedImageHeight,
+              left: (detection.box.x * computedImageWidth) - ((detection.box.w * computedImageWidth) / 2),
+              bottom: computedImageHeight - ((detection.box.y * computedImageHeight) + (detection.box.h * computedImageHeight) / 2),
+              color: 'blue',
+              // if confidence is low than make less visible
+              opacity: detection.confidence < 0.8 ? 0.4 : 1,
+              enlarged: false,
+            }
+          })
+          this.cd.detectChanges()
+        }
+      }
+    }
+
+    // recursive function call
+    videoElement.requestVideoFrameCallback((timestamp, metadata) => this.videoFrameCallback(timestamp, metadata, videoElement))
+  }
+
   toggleEnlarge(objectData: VisualObjectData): void {
-    if (!this.userImage?.nativeElement || !this.config?.imageInstance) {
+    if (!this.userVideo?.nativeElement || !this.config?.videoInstance) {
       return
     }
   
@@ -95,7 +136,7 @@ export class ImageViewerComponent implements OnChanges {
     const widthHeightDifference = Math.abs(objectData.width - objectData.height)
     const isNearlySquare = widthHeightDifference < 40
     const margin = isNearlySquare ? 200 : 50 // Constant margin in pixels
-    const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userImage.nativeElement)
+    const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
   
     if (objectData.enlarged) {
       // revert to original size
@@ -137,13 +178,14 @@ export class ImageViewerComponent implements OnChanges {
   }
   
 
-  private getContainedSize(img: HTMLImageElement): { computedImageWidth: number, computedImageHeight: number } {
-    const ratio = img.naturalWidth/img.naturalHeight
-    let computedImageWidth = img.height * ratio
-    let computedImageHeight = img.height
-    if (computedImageWidth > img.width) {
-      computedImageWidth = img.width
-      computedImageHeight = img.width/ratio
+  private getContainedSize(video: HTMLVideoElement): { computedImageWidth: number, computedImageHeight: number } {
+    console.log('!!! video.videoWidth, video.videoHeight', video.videoWidth, video.videoHeight);
+    const ratio = video.videoWidth/video.videoHeight
+    let computedImageWidth = video.height * ratio
+    let computedImageHeight = video.height
+    if (computedImageWidth > video.width) {
+      computedImageWidth = video.width
+      computedImageHeight = video.width/ratio
     }
     return { computedImageWidth, computedImageHeight }
   }

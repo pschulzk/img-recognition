@@ -1,2 +1,2 @@
 export * from './streaming.model'
-export * from './imgrec.model'
+export * from './object-detection-api.model'
