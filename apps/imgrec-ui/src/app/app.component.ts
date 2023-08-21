@@ -7,7 +7,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
 import { BehaviorSubject, combineLatest, finalize, switchMap } from 'rxjs'
 import { DialogComponent } from './components/dialog/dialog.component'
 import { ImageViewerConfig } from './components/image-viewer/image-viewer.component'
-import { OjectDetectionService } from './services/image-recognition/image-recognition.service'
+import { OjectDetectionApiService } from './services/object-detection-api/object-detection-api.service'
 import { VideoViewerConfig } from './components/video-viewer/video-viewer.component'
 
 @UntilDestroy()
@@ -36,7 +36,7 @@ export class AppComponent implements OnInit {
   isDarkTheme = true
 
   constructor(
-    private objectDetectionService: OjectDetectionService,
+    private objectDetectionService: OjectDetectionApiService,
     private overlay: OverlayContainer,
     private dialog: MatDialog,
     private cd: ChangeDetectorRef,

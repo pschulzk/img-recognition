@@ -6,7 +6,7 @@ import { Observable, catchError, map, of, throwError } from 'rxjs'
 @Injectable({
   providedIn: 'root'
 })
-export class OjectDetectionService {
+export class OjectDetectionApiService {
 
   apiEndPoint = ''
 

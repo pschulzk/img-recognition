@@ -1,17 +1,17 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { HttpClient } from '@angular/common/http'
 import { TestBed } from '@angular/core/testing'
-import { OjectDetectionService } from './image-recognition.service'
+import { OjectDetectionApiService } from './object-detection-api.service'
 
-describe('ImageRecognitionService', () => {
-  let service: OjectDetectionService
+describe('OjectDetectionApiService', () => {
+  let service: OjectDetectionApiService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [HttpClient, OjectDetectionService],
+      providers: [HttpClient, OjectDetectionApiService],
     })
-    service = TestBed.inject(OjectDetectionService)
+    service = TestBed.inject(OjectDetectionApiService)
   })
 
   it('should be defined', () => {
