@@ -4,15 +4,15 @@
 >
 
   <!-- USER UPLOADED VIDEO -->
+  <!-- loop -->
   <video
     *ngIf="config?.videoUrl"
     #userVideo
     [hidden]="isLoading"
-    [muted]="true"
-    autoplay
-    loop
     width="100%"
     controls
+    [muted]="true"
+    autoplay
   >
     <source [src]="config?.videoUrl" type="video/mp4">
   </video>

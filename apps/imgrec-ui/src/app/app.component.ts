@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
   imageViewerConfig?: ImageViewerConfig
   videoViewerConfig?: VideoViewerConfig
   imageObjectDetections$ = new BehaviorSubject<FbnImageRecognitionDetection[]>([])
-  videoObjectDetections$ = new BehaviorSubject<FbnVideoRecognitionResponse | undefined>(undefined)
+  videoObjectDetectionResponse$ = new BehaviorSubject<FbnVideoRecognitionResponse | undefined>(undefined)
 
   errorRemoteServiceUnavailable$ = new BehaviorSubject<boolean>(false)
   errorHasNoPredictions$ = new BehaviorSubject<boolean>(false)
@@ -71,14 +71,15 @@ export class AppComponent implements OnInit {
     combineLatest([
       this.videoUrl$.asObservable(),
       this.videoInstance$.asObservable(),
-      this.videoObjectDetections$.asObservable(),
+      this.videoObjectDetectionResponse$.asObservable(),
     ]).pipe(
       untilDestroyed(this),
-    ).subscribe(([videoUrl, videoInstance, objectDetections]) => {
+    ).subscribe(([videoUrl, videoInstance, videoObjectDetectionResponse]) => {
       this.videoViewerConfig = {
         videoUrl,
         videoInstance,
-        objectDetections,
+        objectDetections: videoObjectDetectionResponse?.frames || [],
+        frameRate: videoObjectDetectionResponse?.frame_rate || 30,
       }
       this.cd.detectChanges()
     })
@@ -160,7 +161,7 @@ export class AppComponent implements OnInit {
         }
         console.log('!!! videoInputChange.response', response)
         this.errorHasNoPredictions$.next(false)
-        this.videoObjectDetections$.next(response)
+        this.videoObjectDetectionResponse$.next(response)
       }
     )
   }
@@ -171,7 +172,7 @@ export class AppComponent implements OnInit {
     this.imageViewerConfig = undefined
     this.videoViewerConfig = undefined
     this.imageObjectDetections$.next([])
-    this.videoObjectDetections$.next(undefined)
+    this.videoObjectDetectionResponse$.next(undefined)
     this.errorHasNoPredictions$.next(false)
     this.cd.detectChanges()
   }

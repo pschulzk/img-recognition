@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChange, ViewChild } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
-import { ColorUtils, FbnImageRecognitionDetection, FbnVideoRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
+import { ColorUtils, FbnImageRecognitionDetection, FbnImageRecognitionDetectionFrame, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { ObjectFrameComponent, VisualObjectData } from '../object-frame/object-frame.component'
 
@@ -10,12 +10,14 @@ export interface VideoViewerConfig {
   videoUrl: string | undefined
   /** instantiated `Image` not embedded in DOM with original `width` and `height` */
   videoInstance: HTMLVideoElement | undefined
+  /** video frame rate */
+  frameRate: number
   /** width of the image in DOM */
   computedImageWidth?: number
   /** height of the image in DOM */
   computedImageHeight?: number
   /** list of detected objects in image */
-  objectDetections: FbnVideoRecognitionResponse | undefined
+  objectDetections: FbnImageRecognitionDetectionFrame[] | undefined
 }
 
 @UntilDestroy()
@@ -47,6 +49,8 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
   objectFrameIsHovered = false
   objectFrameIsEnlarged = false
 
+  computedImageHeightOffsetForControls = 80
+
   constructor(
     private cd: ChangeDetectorRef,
   ) { }
@@ -65,18 +69,21 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
   ngOnChanges(changes: {
     [key in keyof this]: SimpleChange
   }): void {
-    if (changes.config?.previousValue !== changes.config?.currentValue && this.config) {
-      // reset value
-      this.visualObjects = []
-
-      if (!this.userVideo?.nativeElement) {
-        return
+    setTimeout(() => {
+      if (changes.config?.previousValue !== changes.config?.currentValue && this.config) {
+        // reset value
+        this.visualObjects = []
+  
+        if (!this.userVideo?.nativeElement) {
+          return
+        }
+        
+        const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
+        this.config.computedImageWidth = computedImageWidth
+        this.config.computedImageHeight = computedImageHeight
+        console.log('!!! ngOnChanges', computedImageWidth, computedImageHeight)
       }
-      const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
-      this.config.computedImageWidth = computedImageWidth
-      this.config.computedImageHeight = computedImageHeight
-      console.log('!!! ngOnChanges', computedImageWidth, computedImageHeight)
-    }
+    })
   }
 
   identify(index: number, item: VisualObjectData) {
@@ -98,12 +105,12 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
       console.log(`timestamp: ${ timestamp } | frame: ${ JSON.stringify( videoFrameCallbackMetadata, null, 4 ) }`)
   
       // update state
-      const frameRate = this.config.videoInstance?.getVideoPlaybackQuality()?.droppedVideoFrames || 30
+      const frameRate = this.config.frameRate
       const currentFrameNumber = Math.round(videoFrameCallbackMetadata.mediaTime * frameRate)
-      if (this.config.objectDetections?.frames[currentFrameNumber]) {
-        const frameData = this.config.objectDetections?.frames[currentFrameNumber]
+      if (this.config.objectDetections?.[currentFrameNumber]) {
+        const frameData = this.config.objectDetections[currentFrameNumber]
         // check if the correct frame number
-        if (frameData.frameIndex === currentFrameNumber) {
+        if (frameData.frame_index === currentFrameNumber) {
           // update visualization state
           this.visualObjects = this.sortByDistanceFromCenter(frameData.detections).map((detection) => {
             return {
@@ -179,14 +186,22 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
   
 
   private getContainedSize(video: HTMLVideoElement): { computedImageWidth: number, computedImageHeight: number } {
-    console.log('!!! video.videoWidth, video.videoHeight', video.videoWidth, video.videoHeight);
-    const ratio = video.videoWidth/video.videoHeight
-    let computedImageWidth = video.height * ratio
-    let computedImageHeight = video.height
-    if (computedImageWidth > video.width) {
-      computedImageWidth = video.width
-      computedImageHeight = video.width/ratio
+    console.log('!!! video.offsetWidth, video.offsetHeight', video.offsetWidth, video.offsetHeight)
+    const containerWidth = video.offsetWidth
+    const containerHeight = video.offsetHeight
+
+    const videoAspect = video.videoWidth / video.videoHeight
+
+    let computedImageWidth, computedImageHeight
+
+    if (containerWidth / containerHeight > videoAspect) {
+      computedImageWidth = containerHeight * videoAspect
+      computedImageHeight = containerHeight
+    } else {
+      computedImageWidth = containerWidth
+      computedImageHeight = containerWidth / videoAspect
     }
+    computedImageHeight = computedImageHeight - this.computedImageHeightOffsetForControls
     return { computedImageWidth, computedImageHeight }
   }
 

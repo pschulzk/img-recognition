@@ -62,7 +62,7 @@ export class OjectDetectionApiService {
       { fromObject: { fileId } }
     )
 
-    return this.http.get(`${this.apiEndPoint}/video/predict`, { headers, params }).pipe(
+    return this.http.get<FbnVideoRecognitionResponse>(`${this.apiEndPoint}/video/predict`, { headers, params }).pipe(
       map(res => JSON.parse(JSON.stringify(res))),
       catchError(error => throwError(() => error)),
     )

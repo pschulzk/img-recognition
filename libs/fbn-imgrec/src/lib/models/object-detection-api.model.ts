@@ -11,12 +11,15 @@ export interface FbnVideoUploadResponse {
 }
 
 export interface FbnVideoRecognitionResponse {
-  frames: {
-    /** index of video frame starting with 0 */
-    frameIndex: number,
-    detections: FbnImageRecognitionDetection[],
-  }[],
+  frame_rate: number,
+  frames: FbnImageRecognitionDetectionFrame[],
 }
+
+export interface FbnImageRecognitionDetectionFrame {
+  /** index of video frame starting with 0 */
+  frame_index: number,
+  detections: FbnImageRecognitionDetection[],
+}[]
 
 export interface FbnImageRecognitionResponse {
   detections: FbnImageRecognitionDetection[]
