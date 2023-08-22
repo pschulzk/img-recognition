@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
    * Object detection for video query parameter to define threshold for
    * similarly positioned objects between frames to be recognized as the same object.
    */
-  videoTrackingThreshold = 0.05
+  videoTrackingThreshold = 0.08
 
   errorRemoteServiceUnavailable$ = new BehaviorSubject<boolean>(false)
   errorHasNoPredictions$ = new BehaviorSubject<boolean>(false)
@@ -165,7 +165,6 @@ export class AppComponent implements OnInit {
           this.errorHasNoPredictions$.next(true)
           return
         }
-        console.log('!!! videoInputChange.response', response)
         this.errorHasNoPredictions$.next(false)
         this.videoObjectDetectionResponse$.next(response)
       }

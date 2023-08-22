@@ -62,7 +62,6 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
       this.config.computedImageHeight = computedImageHeight
 
       this.userVideo.nativeElement.addEventListener('play', () => this.videoOnPlay())
-      console.log('!!! ngAfterViewInit', computedImageWidth, computedImageHeight)
     }
   }
 
@@ -81,7 +80,6 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
         const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
         this.config.computedImageWidth = computedImageWidth
         this.config.computedImageHeight = computedImageHeight
-        console.log('!!! ngOnChanges', computedImageWidth, computedImageHeight)
       }
     })
   }
@@ -98,11 +96,9 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
   }
 
   videoFrameCallback(timestamp: DOMHighResTimeStamp, videoFrameCallbackMetadata: VideoFrameCallbackMetadata, videoElement: HTMLVideoElement) {
-    console.log('!!! this.visualObjects', this.visualObjects)
     if (this.config && this.config.computedImageWidth && this.config.computedImageHeight) {
       const computedImageWidth: number = this.config.computedImageWidth
       const computedImageHeight: number = this.config.computedImageHeight
-      console.log(`timestamp: ${ timestamp } | frame: ${ JSON.stringify( videoFrameCallbackMetadata, null, 4 ) }`)
   
       // update state
       const frameRate = this.config.frameRate
@@ -112,26 +108,59 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
         // check if the correct frame number
         if (frameData.frame_index === currentFrameNumber) {
           // update visualization state
-          this.visualObjects = this.sortByDistanceFromCenter(frameData.detections).map((detection) => {
-            return {
-              data: detection,
-              width: detection.box.w * computedImageWidth,
-              height: detection.box.h * computedImageHeight,
-              left: (detection.box.x * computedImageWidth) - ((detection.box.w * computedImageWidth) / 2),
-              bottom: computedImageHeight - ((detection.box.y * computedImageHeight) + (detection.box.h * computedImageHeight) / 2),
-              color: 'blue',
-              // if confidence is low than make less visible
-              opacity: detection.confidence < 0.8 ? 0.4 : 1,
-              enlarged: false,
-            }
-          })
-          this.cd.detectChanges()
+          this.updateVisualObjects(this.sortByDistanceFromCenter(frameData.detections), computedImageWidth, computedImageHeight)
         }
       }
     }
 
     // recursive function call
     videoElement.requestVideoFrameCallback((timestamp, metadata) => this.videoFrameCallback(timestamp, metadata, videoElement))
+  }
+
+  updateVisualObjects(nextDetections: FbnImageRecognitionDetection[], computedImageWidth: number, computedImageHeight: number): void {
+    // const updatedVisualObjects: VisualObjectData[] = []
+    const indicesToRemove: number[] = []
+
+    // Update properties of existing objects and retain their instances
+    this.visualObjects.forEach((prevDetection, index) => {
+      const existingDetection = nextDetections.find(nextDetection => nextDetection.id === prevDetection.id)
+      if (existingDetection) {
+        prevDetection.data = existingDetection
+        prevDetection.width = existingDetection.box.w * computedImageWidth
+        prevDetection.height = existingDetection.box.h * computedImageHeight
+        prevDetection.left = (existingDetection.box.x * computedImageWidth) - ((existingDetection.box.w * computedImageWidth) / 2)
+        prevDetection.bottom = computedImageHeight - ((existingDetection.box.y * computedImageHeight) + (existingDetection.box.h * computedImageHeight) / 2)
+        prevDetection.opacity = existingDetection.confidence < 0.8 ? 0.4 : 1
+      } else {
+        // store indices of objects to remove
+        indicesToRemove.push(index)
+      }
+    })
+
+    // remove objects
+    indicesToRemove.forEach((index) => {
+      this.visualObjects.splice(index, 1)
+    })
+
+    // Add new detections
+    nextDetections.forEach((nextDetection) => {
+      const detectionExists = this.visualObjects.some(obj => obj.data.id === nextDetection.id)
+      if (!detectionExists) {
+        this.visualObjects.push({
+          data: nextDetection,
+          width: nextDetection.box.w * computedImageWidth,
+          height: nextDetection.box.h * computedImageHeight,
+          left: (nextDetection.box.x * computedImageWidth) - ((nextDetection.box.w * computedImageWidth) / 2),
+          bottom: computedImageHeight - ((nextDetection.box.y * computedImageHeight) + (nextDetection.box.h * computedImageHeight) / 2),
+          color: ColorUtils.getRandomBrightColor(nextDetection.id),
+          opacity: nextDetection.confidence < 0.8 ? 0.4 : 1,
+          enlarged: false,
+          id: nextDetection.id,
+        })
+      }
+    })
+
+    this.cd.detectChanges()
   }
 
   toggleEnlarge(objectData: VisualObjectData): void {
@@ -186,7 +215,6 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
   
 
   private getContainedSize(video: HTMLVideoElement): { computedImageWidth: number, computedImageHeight: number } {
-    console.log('!!! video.offsetWidth, video.offsetHeight', video.offsetWidth, video.offsetHeight)
     const containerWidth = video.offsetWidth
     const containerHeight = video.offsetHeight
 

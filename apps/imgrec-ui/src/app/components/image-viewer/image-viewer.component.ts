@@ -76,6 +76,7 @@ export class ImageViewerComponent implements OnChanges {
           // if confidence is low than make less visible
           opacity: detection.confidence < 0.8 ? 0.4 : 1,
           enlarged: false,
+          id: detection.id,
         }
       })
       this.cd.detectChanges()

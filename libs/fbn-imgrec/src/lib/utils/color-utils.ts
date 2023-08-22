@@ -1,4 +1,39 @@
 export class ColorUtils {
+
+  public static getRandomBrightColor(uuid?: string): string {
+    const letters = '0123456789ABCDEF'
+    let color = '#'
+
+    if (uuid) {
+      const hash = ColorUtils.hashString(uuid)
+      const random = Math.abs(hash) % 0xFFFFFF // Use the lower 24 bits
+      color = `#${random.toString(16).padStart(6, '0')}`
+    } else {
+      // Generate a random hue (color)
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * letters.length)]
+      }
+    }
+  
+    // Convert the color to RGB format
+    let rgbColor = ColorUtils.hexToRgb(color)
+  
+    // Calculate color brightness (perceived luminance)
+    let brightness = ColorUtils.calculateBrightness(rgbColor)
+  
+    const maxIterations = 10 // Set a maximum number of iterations
+    let iterations = 0
+    
+    while (brightness < 0.7 && iterations < maxIterations) {
+      color = ColorUtils.adjustBrightness(color, 1.2) // Increase brightness by 20%
+      rgbColor = ColorUtils.hexToRgb(color)
+      brightness = ColorUtils.calculateBrightness(rgbColor)
+      iterations++
+    }
+  
+    return color
+  }
+
   private static hexToRgb(hex: string) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
     return result
@@ -21,32 +56,15 @@ export class ColorUtils {
   private static calculateBrightness(rgbColor: { r: number; g: number; b: number }) {
     return (0.299 * rgbColor.r + 0.587 * rgbColor.g + 0.114 * rgbColor.b) / 255
   }
-  
-  public static getRandomBrightColor(): string {
-    const letters = '0123456789ABCDEF'
-    let color = '#'
-  
-    // Generate a random hue (color)
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * letters.length)]
+
+  private static hashString(str: string): number {
+    let hash = 0
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i)
+      hash = (hash << 5) - hash + char
+      hash = hash & hash // Convert to 32-bit integer
     }
-  
-    // Convert the color to RGB format
-    let rgbColor = ColorUtils.hexToRgb(color)
-  
-    // Calculate color brightness (perceived luminance)
-    let brightness = ColorUtils.calculateBrightness(rgbColor)
-  
-    const maxIterations = 10 // Set a maximum number of iterations
-    let iterations = 0
-    
-    while (brightness < 0.7 && iterations < maxIterations) {
-      color = ColorUtils.adjustBrightness(color, 1.2) // Increase brightness by 20%
-      rgbColor = ColorUtils.hexToRgb(color)
-      brightness = ColorUtils.calculateBrightness(rgbColor)
-      iterations++
-    }
-  
-    return color
+    return hash
   }
+
 }

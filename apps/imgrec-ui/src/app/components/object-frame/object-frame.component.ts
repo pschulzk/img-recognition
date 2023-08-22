@@ -11,13 +11,14 @@ export interface VisualObjectData {
   color: string
   opacity: number
   enlarged: boolean
+  id: string
 }
 
 @Component({
   selector: 'fbn-object-frame',
   templateUrl: './object-frame.component.html',
   styleUrls: ['./object-frame.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  // changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [rowCollapseAnimation],
   standalone: true,
   imports: [CommonModule],

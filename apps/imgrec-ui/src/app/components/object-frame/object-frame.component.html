@@ -6,7 +6,8 @@
 </div>
 
 <div
-  *ngIf="objectData"class="object-frame-container"
+  *ngIf="objectData"
+  class="object-frame-container"
   [class.--enlarged]="objectData.enlarged"
   [style.left.px]="objectData.left"
   [style.bottom.px]="objectData.bottom"
@@ -14,6 +15,7 @@
   [style.height.px]="objectData.height"
   [style.border-color]="objectData.color"
   [style.opacity]="objectData.opacity"
+  [attr.data-object-id]="objectData.data.id"
   @rowCollapseAnimation
 >
   <div
