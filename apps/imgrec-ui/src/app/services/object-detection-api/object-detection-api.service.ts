@@ -25,7 +25,7 @@ export class OjectDetectionApiService {
   }
 
   getObjectDetectionForImage(file: File): Observable<FbnImageRecognitionResponse> {
-    const formData:FormData = new FormData()
+    const formData: FormData = new FormData()
     formData.append('image', file, `@${file.name}`)
     
     const headers = new HttpHeaders()
@@ -40,7 +40,7 @@ export class OjectDetectionApiService {
 
   /** upload video file and return video file uuid */
   uploadVideo(file: File): Observable<string> {
-    const formData:FormData = new FormData()
+    const formData: FormData = new FormData()
     formData.append('video', file, `@${file.name}`)
     
     const headers = new HttpHeaders()
@@ -54,13 +54,15 @@ export class OjectDetectionApiService {
     )
   }
 
-  /** get object detection for uploaded video identified via fileId */
-  getObjectDetectionForVideo(fileId: string): Observable<FbnVideoRecognitionResponse> {
-    const headers = new HttpHeaders()
-    headers.append('Accept', 'application/json')
-    const params = new HttpParams(
-      { fromObject: { fileId } }
-    )
+  /**
+   * get object detection for uploaded video identified via fileId
+   * @param fileId uuid of uploaded video
+   * @param trackingThreshold detection for video query parameter to define threshold for similarly positioned objects between frames to be recognized as the same object.
+   * @returns object detection for video
+   */
+  getObjectDetectionForVideo(fileId: string, trackingThreshold = 0.05): Observable<FbnVideoRecognitionResponse> {
+    const headers = new HttpHeaders({ 'Accept': 'application/json'})
+    const params = new HttpParams({ fromObject: { fileId, trackingThreshold } })
 
     return this.http.get<FbnVideoRecognitionResponse>(`${this.apiEndPoint}/video/predict`, { headers, params }).pipe(
       map(res => JSON.parse(JSON.stringify(res))),

@@ -30,6 +30,12 @@ export class AppComponent implements OnInit {
   imageObjectDetections$ = new BehaviorSubject<FbnImageRecognitionDetection[]>([])
   videoObjectDetectionResponse$ = new BehaviorSubject<FbnVideoRecognitionResponse | undefined>(undefined)
 
+  /**
+   * Object detection for video query parameter to define threshold for
+   * similarly positioned objects between frames to be recognized as the same object.
+   */
+  videoTrackingThreshold = 0.05
+
   errorRemoteServiceUnavailable$ = new BehaviorSubject<boolean>(false)
   errorHasNoPredictions$ = new BehaviorSubject<boolean>(false)
 
@@ -151,7 +157,7 @@ export class AppComponent implements OnInit {
     this.isLoading$.next(true)
     this.objectDetectionService.uploadVideo(uploadedVideoFile).pipe(
       untilDestroyed(this),
-      switchMap((fileId: string) => this.objectDetectionService.getObjectDetectionForVideo(fileId)),
+      switchMap((fileId: string) => this.objectDetectionService.getObjectDetectionForVideo(fileId, this.videoTrackingThreshold)),
       finalize(() => this.isLoading$.next(false)),
     ).subscribe(
       (response: FbnVideoRecognitionResponse) => {
