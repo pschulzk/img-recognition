@@ -4,15 +4,14 @@
 >
 
   <!-- USER UPLOADED VIDEO -->
-  <!-- loop -->
   <video
     *ngIf="config?.videoUrl"
-    #userVideo
     [hidden]="isLoading"
-    width="100%"
-    controls
-    [muted]="true"
+    #userVideo
     autoplay
+    loop
+    [muted]="true"
+    [class.--blur]="objectFrameIsHovered || objectFrameIsEnlarged"
   >
     <source [src]="config?.videoUrl" type="video/mp4">
   </video>
@@ -22,30 +21,17 @@
     [style.width.px]="config?.computedImageWidth"
     [style.height.px]="config?.computedImageHeight"
   >
-    <!-- PLACEHOLDER -->
-    <!-- <div
-      *ngIf="!config?.videoUrl || !isLoading" class="user-image-placeholder"
-      @rowCollapseAnimation
-      (click)="clickPlaceholder.emit()"
-    >
-      <mat-icon
-        class="__icon"
-      >
-        upload
-      </mat-icon>
-      <div class="__label">Upload Image</div>
-    </div> -->
-
     <!-- OBJECT FRAME -->
     <fbn-object-frame
-      *ngFor="let objectData of visualObjects; trackBy:identify"
+      *ngFor="let objectData of visualObjects; trackBy: identify"
       [objectData]="objectData"
       [hasLoaded]="!!userVideo"
       [videoInstance]="config?.videoInstance"
+      [videoDomElement]="userVideo?.nativeElement"
       [computedImageWidth]="config?.computedImageWidth"
       [computedImageHeight]="config?.computedImageHeight"
-      (mouseover)="objectFrameIsHovered = true"
-      (mouseleave)="objectFrameIsHovered = false"
+      (mouseover)="objectFrameOnMouseOver()"
+      (mouseleave)="objectFrameOnMouseLeave()"
       (click)="toggleEnlarge(objectData)"
     >
     </fbn-object-frame>

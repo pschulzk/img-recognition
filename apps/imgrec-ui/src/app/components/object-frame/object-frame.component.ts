@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, SimpleChange, ViewChild } from '@angular/core'
+import { ChangeDetectorRef, Component, ElementRef, Input, OnChanges, ViewChild } from '@angular/core'
 import { FbnImageRecognitionDetection, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 
 export interface VisualObjectData {
@@ -18,7 +18,6 @@ export interface VisualObjectData {
   selector: 'fbn-object-frame',
   templateUrl: './object-frame.component.html',
   styleUrls: ['./object-frame.component.scss'],
-  // changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [rowCollapseAnimation],
   standalone: true,
   imports: [CommonModule],
@@ -29,6 +28,7 @@ export class ObjectFrameComponent implements OnChanges {
   @Input() hasLoaded?: boolean = false
   @Input() imageInstance?: HTMLImageElement
   @Input() videoInstance?: HTMLVideoElement
+  @Input() videoDomElement?: HTMLVideoElement
   @Input() computedImageWidth?: number
   @Input() computedImageHeight?: number
 
@@ -40,24 +40,20 @@ export class ObjectFrameComponent implements OnChanges {
     private cd: ChangeDetectorRef,
   ) { }
 
-  ngOnChanges(changes: {
-    [key in keyof this]: SimpleChange
-  }): void {
-    if (changes.hasLoaded?.previousValue !== changes.hasLoaded?.currentValue || changes.objectData?.currentValue) {
-      this.drawImageOnCanvas()
-    }
+  ngOnChanges(): void {
+    this.drawImageOnCanvas()
   }
 
   drawImageOnCanvas(): void {
     this.cd.detectChanges()
-    if (this.hasLoaded && this.objectCanvas && this.objectData && this.computedImageWidth && this.computedImageHeight && (this.imageInstance || this.videoInstance)) {
+    if (this.hasLoaded && this.objectCanvas && this.objectData && this.computedImageWidth && this.computedImageHeight && (this.imageInstance || this.videoDomElement)) {
 
       this.context = this.objectCanvas.nativeElement.getContext('2d')
       if (!this.context) {
         throw new Error('Could not get 2d context from canvas')
       }
-      const instanceWidth = this.imageInstance?.width || this.videoInstance?.videoWidth
-      const instanceHeight = this.imageInstance?.height || this.videoInstance?.videoHeight
+      const instanceWidth = this.imageInstance?.width || this.videoDomElement?.videoWidth
+      const instanceHeight = this.imageInstance?.height || this.videoDomElement?.videoHeight
       if (!instanceWidth || !instanceHeight) {
         throw new Error('Could not get instance width or height')
       }
@@ -81,15 +77,23 @@ export class ObjectFrameComponent implements OnChanges {
   
       // Clear the canvas before drawing
       this.context.clearRect(0, 0, destWidth, destHeight)
-  
+
+      let instance: CanvasImageSource | undefined
       if (this.imageInstance) {
-        // Draw the image on the canvas
-        this.context.drawImage(
-          this.imageInstance, // The Image instance
-          sourceX, sourceY, sourceWidth, sourceHeight, // Source rectangle
-          destX, destY, destWidth, destHeight // Destination rectangle
-        )
+        instance = this.imageInstance
       }
+      if (this.videoDomElement) {
+        instance = this.videoDomElement
+      }
+      if (!instance) {
+        throw new Error('Could not get instance')
+      }
+      // Draw the image on the canvas
+      this.context.drawImage(
+        instance,
+        sourceX, sourceY, sourceWidth, sourceHeight, // Source rectangle
+        destX, destY, destWidth, destHeight // Destination rectangle
+      )
       this.cd.detectChanges()
     }
   }

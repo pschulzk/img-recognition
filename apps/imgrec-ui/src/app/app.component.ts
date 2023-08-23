@@ -4,7 +4,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
 import { MatSlideToggleChange } from '@angular/material/slide-toggle'
 import { FbnImageRecognitionDetection, FbnImageRecognitionResponse, FbnVideoRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
-import { BehaviorSubject, combineLatest, finalize, switchMap } from 'rxjs'
+import { BehaviorSubject, Subscription, combineLatest, finalize, switchMap } from 'rxjs'
 import { DialogComponent } from './components/dialog/dialog.component'
 import { ImageViewerConfig } from './components/image-viewer/image-viewer.component'
 import { OjectDetectionApiService } from './services/object-detection-api/object-detection-api.service'
@@ -34,12 +34,14 @@ export class AppComponent implements OnInit {
    * Object detection for video query parameter to define threshold for
    * similarly positioned objects between frames to be recognized as the same object.
    */
-  videoTrackingThreshold = 0.08
+  videoTrackingThreshold = 0.01
 
   errorRemoteServiceUnavailable$ = new BehaviorSubject<boolean>(false)
   errorHasNoPredictions$ = new BehaviorSubject<boolean>(false)
 
   isDarkTheme = true
+
+  private requestSubscriptions$: Subscription[] = []
 
   constructor(
     private objectDetectionService: OjectDetectionApiService,
@@ -115,7 +117,7 @@ export class AppComponent implements OnInit {
 
     // request image recognition meta  data
     this.isLoading$.next(true)
-    this.objectDetectionService.getObjectDetectionForImage(uploadedImageFile).pipe(
+    this.requestSubscriptions$.push(this.objectDetectionService.getObjectDetectionForImage(uploadedImageFile).pipe(
       untilDestroyed(this),
       finalize(() => this.isLoading$.next(false)),
     ).subscribe(
@@ -127,7 +129,7 @@ export class AppComponent implements OnInit {
         this.errorHasNoPredictions$.next(false)
         this.imageObjectDetections$.next(response.detections)
       }
-    )
+    ))
   }
 
   videoInputChange(fileInputEvent: Event) {
@@ -155,7 +157,7 @@ export class AppComponent implements OnInit {
 
     // request video recognition meta  data
     this.isLoading$.next(true)
-    this.objectDetectionService.uploadVideo(uploadedVideoFile).pipe(
+    this.requestSubscriptions$.push(this.objectDetectionService.uploadVideo(uploadedVideoFile).pipe(
       untilDestroyed(this),
       switchMap((fileId: string) => this.objectDetectionService.getObjectDetectionForVideo(fileId, this.videoTrackingThreshold)),
       finalize(() => this.isLoading$.next(false)),
@@ -168,10 +170,12 @@ export class AppComponent implements OnInit {
         this.errorHasNoPredictions$.next(false)
         this.videoObjectDetectionResponse$.next(response)
       }
-    )
+    ))
   }
 
   reset() {
+    // cancel all pending http requests
+    this.requestSubscriptions$.forEach((subscription) => subscription.unsubscribe())
     this.imageUrl$.next(undefined)
     this.videoUrl$.next(undefined)
     this.imageViewerConfig = undefined

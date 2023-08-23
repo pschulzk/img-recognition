@@ -57,10 +57,12 @@ export class OjectDetectionApiService {
   /**
    * get object detection for uploaded video identified via fileId
    * @param fileId uuid of uploaded video
-   * @param trackingThreshold detection for video query parameter to define threshold for similarly positioned objects between frames to be recognized as the same object.
+   * @param trackingThreshold WORK IN PROGRESS: Threshold percentage ranging from 0 to 1 for object detection service backend to
+   * identify moving objects among multiple frames by tracking via detection UUID.
+   * In current implementation, values > 0 cause video prediction canvases to draw wrong bounding boxes contents.
    * @returns object detection for video
    */
-  getObjectDetectionForVideo(fileId: string, trackingThreshold = 0.05): Observable<FbnVideoRecognitionResponse> {
+  getObjectDetectionForVideo(fileId: string, trackingThreshold = 0): Observable<FbnVideoRecognitionResponse> {
     const headers = new HttpHeaders({ 'Accept': 'application/json'})
     const params = new HttpParams({ fromObject: { fileId, trackingThreshold } })
 
