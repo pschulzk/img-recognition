@@ -146,8 +146,8 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
   
     const isLandscape = objectData.width > objectData.height
     const widthHeightDifference = Math.abs(objectData.width - objectData.height)
-    const isNearlySquare = widthHeightDifference < 40
-    const margin = isNearlySquare ? 200 : 50 // Constant margin in pixels
+    const isNearlySquare = widthHeightDifference < 75
+    const margin = isNearlySquare ? 350 : 80 // Constant margin in pixels
     const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
   
     if (objectData.enlarged) {
