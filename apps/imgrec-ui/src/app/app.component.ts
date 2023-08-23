@@ -4,11 +4,12 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
 import { MatSlideToggleChange } from '@angular/material/slide-toggle'
 import { FbnImageRecognitionDetection, FbnImageRecognitionResponse, FbnVideoRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
-import { BehaviorSubject, Subscription, combineLatest, finalize, switchMap } from 'rxjs'
+import { BehaviorSubject, Observable, Subscription, combineLatest, finalize, forkJoin, switchMap } from 'rxjs'
 import { DialogComponent } from './components/dialog/dialog.component'
 import { ImageViewerConfig } from './components/image-viewer/image-viewer.component'
 import { OjectDetectionApiService } from './services/object-detection-api/object-detection-api.service'
 import { VideoViewerConfig } from './components/video-viewer/video-viewer.component'
+import { HttpClient } from '@angular/common/http'
 
 @UntilDestroy()
 @Component({
@@ -47,6 +48,7 @@ export class AppComponent implements OnInit {
     private objectDetectionService: OjectDetectionApiService,
     private overlay: OverlayContainer,
     private dialog: MatDialog,
+    private http: HttpClient,
     private cd: ChangeDetectorRef,
   ) { }
 
@@ -91,6 +93,8 @@ export class AppComponent implements OnInit {
       }
       this.cd.detectChanges()
     })
+
+    this.initVideoDemo()
   }
 
   imageInputChange(fileInputEvent: Event) {
@@ -149,8 +153,7 @@ export class AppComponent implements OnInit {
       this.videoUrl$.next(reader.result as string)
       const videoInstance = document.createElement('video')
       videoInstance.src = reader.result as string
-      videoInstance.onloadeddata = (ev) => {
-        // ev.currentTarget?.
+      videoInstance.onloadeddata = () => {
         this.videoInstance$.next(videoInstance)
       }
     }
@@ -215,5 +218,39 @@ export class AppComponent implements OnInit {
     } else {
       this.overlay.getContainerElement().classList.remove(darkThemeClassName)
     }
+  }
+
+  initVideoDemo() {
+    this.reset()
+    this.isLoading$.next(true)
+    this.requestSubscriptions$.push(forkJoin([
+      this.getAssetByFileName('demo_data-video.mp4'),
+      this.getAssetByFileName('demo_data-video_prediction.json'),
+    ]).pipe(
+      untilDestroyed(this),
+      finalize(() => this.isLoading$.next(false)),
+    ).subscribe(([videoData, jsonData]) => {
+      // cached video data
+      const videoUrl = URL.createObjectURL(videoData)
+      this.videoUrl$.next(videoUrl)
+      const videoInstance = document.createElement('video')
+      videoInstance.src = videoUrl
+      videoInstance.onloadeddata = () => {
+        this.videoInstance$.next(videoInstance)
+      }
+      // cached json data
+      const reader = new FileReader()
+      reader.readAsText(jsonData)
+      reader.onload = () => {
+        const demoData = JSON.parse(reader.result as string) as FbnVideoRecognitionResponse
+        this.videoObjectDetectionResponse$.next(demoData)
+        // log only first 10 lines of demo data
+        console.log('demo data', demoData.frames.slice(0, 3))
+      }
+    }))
+  }
+
+  private getAssetByFileName(fileName: string): Observable<Blob> {
+    return this.http.get(`assets/${fileName}`, { responseType: 'blob' })
   }
 }
