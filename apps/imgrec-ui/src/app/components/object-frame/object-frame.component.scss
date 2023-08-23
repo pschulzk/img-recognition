@@ -23,12 +23,12 @@
 .object-frame-container {
   position: absolute;
   transition: box-shadow 0.2s ease-in-out;
-  box-shadow: 0 0 1.5rem rgba(black, 1);
+  box-shadow: 0 0 2rem 0.25rem #000;
 
   &.--enlarged {
     z-index: 3;
     opacity: 1 !important;
-    box-shadow: 0 0 5rem rgba(black, 1);
+    box-shadow: 0 0 2rem 1rem #000;
 
     & .__object-data {
       visibility: visible;
@@ -40,7 +40,7 @@
     &:not(.--enlarged) {
       z-index: 1;
       opacity: 1 !important;
-      box-shadow: 0 0 2.5rem rgba(black, 1);
+      box-shadow: 0 0 3rem 1rem #000;
       cursor: pointer;
       
       & .__object-data {

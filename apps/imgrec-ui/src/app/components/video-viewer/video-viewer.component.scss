@@ -8,13 +8,13 @@
     height: 100%;
     object-fit: contain;
     position: relative;
-    filter: blur(0);
+    filter: brightness(100%) blur(0);
     transition: filter 0.2s ease-in-out;
     -webkit-transition: 0.2s -webkit-filter ease-in-out;
     -o-transition: 0.2s -o-filter ease-in-out;
 
     &.--blur {
-      filter: blur(5px);
+      filter: brightness(80%) blur(5px);
     }
   }
 }
