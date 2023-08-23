@@ -35,10 +35,7 @@ export class AppComponent implements OnInit {
    * Object detection for video query parameter to define threshold for
    * similarly positioned objects between frames to be recognized as the same object.
    */
-  videoTrackingThreshold = 0.01
-
-  errorRemoteServiceUnavailable$ = new BehaviorSubject<boolean>(false)
-  errorHasNoPredictions$ = new BehaviorSubject<boolean>(false)
+  videoTrackingThreshold = 0
 
   isDarkTheme = true
 
@@ -58,7 +55,6 @@ export class AppComponent implements OnInit {
       untilDestroyed(this),
     ).subscribe((isHealthy) => {
       if (!isHealthy) {
-        this.errorRemoteServiceUnavailable$.next(true)
         this.openDialog({
           title: 'Error',
           content: 'Remote service is currently not available. Please try again later.',
@@ -141,10 +137,8 @@ export class AppComponent implements OnInit {
     ).subscribe(
       (response: FbnImageRecognitionResponse) => {
         if (response.detections.length === 0) {
-          this.errorHasNoPredictions$.next(true)
           return
         }
-        this.errorHasNoPredictions$.next(false)
         this.imageObjectDetections$.next(response.detections)
       }
     ))
@@ -189,14 +183,12 @@ export class AppComponent implements OnInit {
     ).subscribe(
       (response: FbnVideoRecognitionResponse) => {
         if (response.frames.length === 0) {
-          this.errorHasNoPredictions$.next(true)
           this.openDialog({
             title: 'Error',
             content: 'No objects could be identified. Please try again or try another image',
           })
           return
         }
-        this.errorHasNoPredictions$.next(false)
         this.videoObjectDetectionResponse$.next(response)
       }
     ))
@@ -214,7 +206,6 @@ export class AppComponent implements OnInit {
     this.videoViewerConfig = undefined
     this.imageObjectDetections$.next([])
     this.videoObjectDetectionResponse$.next(undefined)
-    this.errorHasNoPredictions$.next(false)
     this.cd.detectChanges()
   }
 
