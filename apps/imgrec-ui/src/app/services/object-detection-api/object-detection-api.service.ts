@@ -32,7 +32,7 @@ export class OjectDetectionApiService {
     headers.append('Content-Type', 'multipart/form-data')
     headers.append('Accept', 'application/json')
 
-    return this.http.post<FbnImageRecognitionResponse>(`${this.apiEndPoint}/predict`, formData, { headers }).pipe(
+    return this.http.post<FbnImageRecognitionResponse>(`${this.apiEndPoint}/image/predict`, formData, { headers }).pipe(
       map((res: FbnImageRecognitionResponse) => JSON.parse(JSON.stringify(res))),
       catchError(error => throwError(() => error)),
     )
