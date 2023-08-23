@@ -1,15 +1,15 @@
 import { OverlayContainer } from '@angular/cdk/overlay'
+import { HttpClient } from '@angular/common/http'
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
 import { MatSlideToggleChange } from '@angular/material/slide-toggle'
 import { FbnImageRecognitionDetection, FbnImageRecognitionResponse, FbnVideoRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
-import { BehaviorSubject, Observable, Subscription, combineLatest, finalize, forkJoin, switchMap } from 'rxjs'
+import { BehaviorSubject, Observable, Subscription, catchError, combineLatest, finalize, forkJoin, switchMap, throwError } from 'rxjs'
 import { DialogComponent } from './components/dialog/dialog.component'
 import { ImageViewerConfig } from './components/image-viewer/image-viewer.component'
-import { OjectDetectionApiService } from './services/object-detection-api/object-detection-api.service'
 import { VideoViewerConfig } from './components/video-viewer/video-viewer.component'
-import { HttpClient } from '@angular/common/http'
+import { OjectDetectionApiService } from './services/object-detection-api/object-detection-api.service'
 
 @UntilDestroy()
 @Component({
@@ -57,7 +57,13 @@ export class AppComponent implements OnInit {
     this.objectDetectionService.getIsHealthy().pipe(
       untilDestroyed(this),
     ).subscribe((isHealthy) => {
-      this.errorRemoteServiceUnavailable$.next(!isHealthy)
+      if (!isHealthy) {
+        this.errorRemoteServiceUnavailable$.next(true)
+        this.openDialog({
+          title: 'Error',
+          content: 'Remote service is currently not available. Please try again later.',
+        })
+      }
       this.cd.detectChanges()
     })
 
@@ -97,6 +103,10 @@ export class AppComponent implements OnInit {
     this.initVideoDemo()
   }
 
+  /**
+   * Handle image file input change event triggered by user.
+   * @param fileInputEvent image file input change event
+   */
   imageInputChange(fileInputEvent: Event) {
     this.reset()
     // read uploaded image file from event
@@ -123,6 +133,10 @@ export class AppComponent implements OnInit {
     this.isLoading$.next(true)
     this.requestSubscriptions$.push(this.objectDetectionService.getObjectDetectionForImage(uploadedImageFile).pipe(
       untilDestroyed(this),
+      catchError((error) => {
+        this.openErrorDialog(error)
+        return throwError(() => error)
+      }),
       finalize(() => this.isLoading$.next(false)),
     ).subscribe(
       (response: FbnImageRecognitionResponse) => {
@@ -136,6 +150,10 @@ export class AppComponent implements OnInit {
     ))
   }
 
+  /**
+   * Handle video file input change event triggered by user.
+   * @param fileInputEvent video file input change event
+   */
   videoInputChange(fileInputEvent: Event) {
     this.reset()
     // read uploaded video file from event
@@ -163,11 +181,19 @@ export class AppComponent implements OnInit {
     this.requestSubscriptions$.push(this.objectDetectionService.uploadVideo(uploadedVideoFile).pipe(
       untilDestroyed(this),
       switchMap((fileId: string) => this.objectDetectionService.getObjectDetectionForVideo(fileId, this.videoTrackingThreshold)),
+      catchError((error) => {
+        this.openErrorDialog(error)
+        return throwError(() => error)
+      }),
       finalize(() => this.isLoading$.next(false)),
     ).subscribe(
       (response: FbnVideoRecognitionResponse) => {
         if (response.frames.length === 0) {
           this.errorHasNoPredictions$.next(true)
+          this.openDialog({
+            title: 'Error',
+            content: 'No objects could be identified. Please try again or try another image',
+          })
           return
         }
         this.errorHasNoPredictions$.next(false)
@@ -176,6 +202,9 @@ export class AppComponent implements OnInit {
     ))
   }
 
+  /**
+   * Reset all data streams and cancel all pending http requests.
+   */
   reset() {
     // cancel all pending http requests
     this.requestSubscriptions$.forEach((subscription) => subscription.unsubscribe())
@@ -189,23 +218,47 @@ export class AppComponent implements OnInit {
     this.cd.detectChanges()
   }
 
+  /**
+   * Toggle theme between light and dark.
+   * @param event theme toggle change event
+   */
   themeToggleChange(event: MatSlideToggleChange) {
     this.isDarkTheme = event.checked
   }
 
-  openDialog() {
-    const dialogConfig = new MatDialogConfig<{
-      title: string,
-      content: string,
-    }>()
+  openInfoDialog() {
+    this.openDialog({
+      title: 'Info',
+      content: 'This application is for demoing object recognition in images. Please upload an image of type JPG and see the results.',
+    })
+  }
+
+  /**
+   * Open error dialog with error message.
+   * @param error error object
+   */
+  openErrorDialog(error: any): void {
+    const content = error?.error?.description || error?.message || 'An error occured. This service is currently unavailable. Please try again later.'
+    this.openDialog({
+      title: 'Error',
+      content,
+    })
+  }
+
+  /**
+   * Open dialog with title and content.
+   * @param config dialog config
+   */
+  private openDialog<T = {
+    title: string,
+    content: string,
+  }>(config: T) {
+    const dialogConfig = new MatDialogConfig<T>()
     dialogConfig.width = '400px'
     dialogConfig.position = {
       top: '100px',
     }
-    dialogConfig.data = {
-      title: 'Info',
-      content: 'This application is for demoing object recognition in images. Please upload an image of type JPG and see the results.',
-    }
+    dialogConfig.data = config
 
     dialogConfig.disableClose = true
     dialogConfig.autoFocus = true
@@ -220,7 +273,10 @@ export class AppComponent implements OnInit {
     }
   }
 
-  initVideoDemo() {
+  /**
+   * Initialize video demo data.
+   */
+  private initVideoDemo() {
     this.reset()
     this.isLoading$.next(true)
     this.requestSubscriptions$.push(forkJoin([
@@ -244,12 +300,14 @@ export class AppComponent implements OnInit {
       reader.onload = () => {
         const demoData = JSON.parse(reader.result as string) as FbnVideoRecognitionResponse
         this.videoObjectDetectionResponse$.next(demoData)
-        // log only first 10 lines of demo data
-        console.log('demo data', demoData.frames.slice(0, 3))
       }
     }))
   }
 
+  /**
+   * Get asset by file name.
+   * @param fileName file name of asset
+   */
   private getAssetByFileName(fileName: string): Observable<Blob> {
     return this.http.get(`assets/${fileName}`, { responseType: 'blob' })
   }

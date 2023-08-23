@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChange, ViewChild } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
-import { ColorUtils, FbnImageRecognitionDetection, FbnImageRecognitionDetectionFrame, rowCollapseAnimation } from '@fbn/fbn-imgrec'
+import { FbnImageRecognitionDetection, FbnImageRecognitionDetectionFrame, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { ObjectFrameComponent, VisualObjectData } from '../object-frame/object-frame.component'
 
