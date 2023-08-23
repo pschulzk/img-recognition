@@ -1,16 +1,26 @@
 {
   "/api": {
-    "target": "http://localhost:3000",
+    "target": "http://0.0.0.0:3000",
     "secure": false,
     "changeOrigin": true
   },
   "/healthcheck": {
-    "target": "http://localhost:8000",
+    "target": "http://0.0.0.0:8000",
     "secure": false,
     "changeOrigin": true
   },
-  "/predict": {
-    "target": "http://localhost:8000",
+  "/image/predict": {
+    "target": "http://0.0.0.0:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/video/upload": {
+    "target": "http://0.0.0.0:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/video/predict": {
+    "target": "http://0.0.0.0:8000",
     "secure": false,
     "changeOrigin": true
   }
