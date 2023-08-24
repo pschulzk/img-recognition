@@ -67,20 +67,20 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
   ngOnChanges(changes: {
     [key in keyof this]: SimpleChange
   }): void {
-    // setTimeout(() => {
-    if (changes.config?.previousValue !== changes.config?.currentValue && this.config) {
+    setTimeout(() => {
+      if (changes.config?.previousValue !== changes.config?.currentValue && this.config) {
       // reset value
-      this.visualObjects = []
+        this.visualObjects = []
   
-      if (!this.userVideo?.nativeElement) {
-        return
-      }
+        if (!this.userVideo?.nativeElement) {
+          return
+        }
         
-      const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
-      this.config.computedImageWidth = computedImageWidth
-      this.config.computedImageHeight = computedImageHeight
-    }
-    // })
+        const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
+        this.config.computedImageWidth = computedImageWidth
+        this.config.computedImageHeight = computedImageHeight
+      }
+    })
   }
 
   identify(index: number, item: VisualObjectData) {
@@ -192,7 +192,20 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
     this.cd.detectChanges()
   }
 
-  private updateVisualObjects(nextDetections: FbnImageRecognitionDetection[], computedImageWidth: number, computedImageHeight: number, enabledObjectTracking = false): void {
+  /**
+   * Updates the visual object detection in an image or frame in the view.
+   * @param nextDetections list of detected objects in image
+   * @param computedImageWidth width of the HTMLImageElement embedded in the view DOM in actual rendered pixels
+   * @param computedImageHeight height of the HTMLImageElement embedded in the view DOM in actual rendered pixels
+   * @param enabledObjectTracking whether to enable object tracking. If enabled, existing objects will be updated and new objects will be added.
+   * If disabled, all objects will be reset.
+   */
+  private updateVisualObjects(
+    nextDetections: FbnImageRecognitionDetection[],
+    computedImageWidth: number,
+    computedImageHeight: number,
+    enabledObjectTracking = false,
+  ): void {
     if (enabledObjectTracking) {
       const indicesToRemove: number[] = []
 
