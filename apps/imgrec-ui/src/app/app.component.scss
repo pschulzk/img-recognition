@@ -1,11 +1,5 @@
 /* OUTER */
 
-mat-toolbar {
-  position: relative;
-  box-shadow: 0 0 1rem 0.1rem black;
-  z-index: 1;
-}
-
 .content {
   min-height: 100%;
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
@@ -32,7 +26,6 @@ mat-toolbar {
   margin: auto;
   
   background-color: rgba(white, 0.5);
-  z-index: 1;
   display: flex;
   align-content: center;
   align-items: center;
@@ -40,6 +33,12 @@ mat-toolbar {
 }
 
 /* INNER */
+
+mat-toolbar {
+  position: relative;
+  box-shadow: 0 0 1rem 0.1rem black;
+  z-index: 1;
+}
 
 .title {
   margin-left: 1rem;
@@ -64,9 +63,3 @@ mat-toolbar {
     padding: 0 1rem;
   }
 }
-
-/* .message {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-} */
