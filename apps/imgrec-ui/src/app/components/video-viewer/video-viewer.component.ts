@@ -87,6 +87,10 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
         this.config.computedImageHeight = computedImageHeight
       }
     })
+    // initially refresh sub-views
+    // TODO: find a better way to do this
+    this.objectFrameOnMouseOver()
+    this.objectFrameOnMouseLeave()
   }
 
   identify(index: number, item: FbnObjectFrameComponentData) {
@@ -177,65 +181,47 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
     computedImageHeight: number,
     enabledObjectTracking = false,
   ): void {
-    if (enabledObjectTracking) {
-      const indicesToRemove: number[] = []
+    const indicesToRemove: number[] = []
 
-      // Update properties of existing objects and retain their instances
-      this.visualObjects.forEach((prevDetection, index) => {
-        const existingDetection = nextDetections.find(nextDetection => nextDetection.id === prevDetection.id)
-        if (existingDetection) {
-          prevDetection.data = existingDetection
-          prevDetection.width = existingDetection.box.w * computedImageWidth
-          prevDetection.height = existingDetection.box.h * computedImageHeight
-          prevDetection.left = (existingDetection.box.x * computedImageWidth) - ((existingDetection.box.w * computedImageWidth) / 2)
-          prevDetection.bottom = computedImageHeight - ((existingDetection.box.y * computedImageHeight) + (existingDetection.box.h * computedImageHeight) / 2)
-          prevDetection.opacity = existingDetection.confidence < 0.8 ? 0.4 : 1
-        } else {
-          // store indices of objects to remove
-          indicesToRemove.push(index)
-        }
-      })
+    // Update properties of existing objects and retain their instances
+    this.visualObjects.forEach((prevDetection, index) => {
+      const existingDetection = nextDetections.find(nextDetection => nextDetection.id === prevDetection.id)
+      if (existingDetection) {
+        prevDetection.data = existingDetection
+        prevDetection.width = existingDetection.box.w * computedImageWidth
+        prevDetection.height = existingDetection.box.h * computedImageHeight
+        prevDetection.left = (existingDetection.box.x * computedImageWidth) - ((existingDetection.box.w * computedImageWidth) / 2)
+        prevDetection.bottom = computedImageHeight - ((existingDetection.box.y * computedImageHeight) + (existingDetection.box.h * computedImageHeight) / 2)
+        prevDetection.opacity = existingDetection.confidence < 0.8 ? 0.4 : 1
+      } else {
+        // store indices of objects to remove
+        indicesToRemove.push(index)
+      }
+    })
   
-      // remove objects
-      indicesToRemove.forEach((index) => {
-        this.visualObjects.splice(index, 1)
-      })
+    // remove objects
+    indicesToRemove.forEach((index) => {
+      this.visualObjects.splice(index, 1)
+    })
   
-      // Add new detections
-      nextDetections.forEach((nextDetection) => {
-        const detectionExists = this.visualObjects.some(obj => obj.data.id === nextDetection.id)
-        if (!detectionExists) {
-          this.visualObjects.push({
-            data: nextDetection,
-            width: nextDetection.box.w * computedImageWidth,
-            height: nextDetection.box.h * computedImageHeight,
-            left: (nextDetection.box.x * computedImageWidth) - ((nextDetection.box.w * computedImageWidth) / 2),
-            bottom: computedImageHeight - ((nextDetection.box.y * computedImageHeight) + (nextDetection.box.h * computedImageHeight) / 2),
-            color: ColorUtils.getRandomBrightColor(nextDetection.id),
-            opacity: nextDetection.confidence < 0.8 ? 0.4 : 1,
-            enlarged: false,
-            id: nextDetection.id,
-          })
-        }
-      })
-    } else {
-      // reset visual objects
-      this.visualObjects.length = 0
-      // Add new detections
-      nextDetections.forEach((nextDetection) => {
+    // Add new detections
+    nextDetections.forEach((nextDetection) => {
+      const detectionExists = this.visualObjects.some(obj => obj.data.id === nextDetection.id)
+      if (!detectionExists) {
         this.visualObjects.push({
           data: nextDetection,
           width: nextDetection.box.w * computedImageWidth,
           height: nextDetection.box.h * computedImageHeight,
           left: (nextDetection.box.x * computedImageWidth) - ((nextDetection.box.w * computedImageWidth) / 2),
           bottom: computedImageHeight - ((nextDetection.box.y * computedImageHeight) + (nextDetection.box.h * computedImageHeight) / 2),
-          color: '#fff',
+          color: enabledObjectTracking ? ColorUtils.getRandomBrightColor(nextDetection.id): 'white',
           opacity: nextDetection.confidence < 0.8 ? 0.4 : 1,
           enlarged: false,
           id: nextDetection.id,
         })
-      })
-    }
+      }
+    })
+
 
     this.cd.detectChanges()
   }

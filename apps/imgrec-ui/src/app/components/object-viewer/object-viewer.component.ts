@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatIconModule } from '@angular/material/icon'
 import { FbnImageRecognitionDetection, rowCollapseAnimation } from '@fbn/fbn-imgrec'
@@ -8,6 +8,7 @@ import { FbnImageRecognitionDetection, rowCollapseAnimation } from '@fbn/fbn-img
   selector: 'fbn-object-viewer',
   templateUrl: './object-viewer.component.html',
   styleUrls: ['./object-viewer.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [rowCollapseAnimation],
   standalone: true,
   imports: [
