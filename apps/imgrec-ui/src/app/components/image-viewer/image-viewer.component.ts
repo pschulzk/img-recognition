@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Even
 import { MatIconModule } from '@angular/material/icon'
 import { ColorUtils, FbnImageRecognitionDetection, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy } from '@ngneat/until-destroy'
-import { ObjectFrameComponent, VisualObjectData } from '../object-frame/object-frame.component'
+import { FbnObjectFrameComponentData, ObjectFrameComponent } from '../object-frame/object-frame.component'
 
 export interface ImageViewerConfig {
   /** base64 encoded image URL */
@@ -42,7 +42,7 @@ export class ImageViewerComponent implements OnChanges {
   
   @ViewChild('userImage', { static: false, read: ElementRef }) userImage?: ElementRef<HTMLImageElement>
 
-  visualObjects: VisualObjectData[] = []
+  visualObjects: FbnObjectFrameComponentData[] = []
 
   objectFrameIsHovered = false
   objectFrameIsEnlarged = false
@@ -83,11 +83,11 @@ export class ImageViewerComponent implements OnChanges {
     }
   }
 
-  identify(index: number, item: VisualObjectData) {
+  identify(index: number, item: FbnObjectFrameComponentData) {
     return item.data.id
   }
 
-  toggleEnlarge(objectData: VisualObjectData): void {
+  toggleEnlarge(objectData: FbnObjectFrameComponentData): void {
     if (!this.userImage?.nativeElement || !this.config?.imageInstance) {
       return
     }

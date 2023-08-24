@@ -37,3 +37,9 @@
     </fbn-object-frame>
   </div>
 </div>
+<fbn-object-viewer
+  [objectData]="objectViewerObjectData"
+  [imageSrc]="objectViewerImageDataUrl"
+  (actionClose)="toggleEnlarge()"
+>
+</fbn-object-viewer>

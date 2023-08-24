@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectorRef, Component, ElementRef, Input, OnChanges, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, ViewChild } from '@angular/core'
 import { FbnImageRecognitionDetection, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 
-export interface VisualObjectData {
+export interface FbnObjectFrameComponentData {
   data: FbnImageRecognitionDetection
   width: number
   height: number
@@ -18,13 +18,14 @@ export interface VisualObjectData {
   selector: 'fbn-object-frame',
   templateUrl: './object-frame.component.html',
   styleUrls: ['./object-frame.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [rowCollapseAnimation],
   standalone: true,
   imports: [CommonModule],
 })
 export class ObjectFrameComponent implements OnChanges {
 
-  @Input() objectData?: VisualObjectData
+  @Input() objectData?: FbnObjectFrameComponentData
   @Input() hasLoaded?: boolean = false
   @Input() imageInstance?: HTMLImageElement
   @Input() videoInstance?: HTMLVideoElement
