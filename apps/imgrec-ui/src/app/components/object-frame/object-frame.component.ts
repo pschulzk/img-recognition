@@ -33,7 +33,8 @@ export class ObjectFrameComponent implements OnChanges {
   @Input() computedImageWidth?: number
   @Input() computedImageHeight?: number
 
-  @ViewChild('objectCanvas', { static: false, read: ElementRef }) objectCanvas?: ElementRef<HTMLCanvasElement>
+  @ViewChild('objectCanvas', { static: false, read: ElementRef })
+    objectCanvas?: ElementRef<HTMLCanvasElement>
 
   context: CanvasRenderingContext2D | null = null
 

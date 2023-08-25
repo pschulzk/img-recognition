@@ -282,14 +282,12 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
     })
   }
 
-  // Play video function
   async playUserVideo() {      
     if (this.userVideo?.nativeElement.paused && !this.videoIsPlaying) {
-      return this.userVideo?.nativeElement.play()
+      return await this.userVideo?.nativeElement.play()
     }
   } 
 
-  // Pause video function
   pauseUserVideo() {     
     if (!this.userVideo?.nativeElement.paused && this.videoIsPlaying) {
       this.userVideo?.nativeElement.pause()

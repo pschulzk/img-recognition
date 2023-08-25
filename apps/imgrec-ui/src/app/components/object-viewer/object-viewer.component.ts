@@ -25,9 +25,6 @@ export class ObjectViewerComponent {
 
   @Output() actionClose = new EventEmitter<void>()
 
-  @Output() hasLoaded = new EventEmitter<boolean>()
-  _hasLoaded = false
-
   @ViewChild('objectViewerContainer', { static: false, read: ElementRef })
     objectViewerContainer?: ElementRef<HTMLDivElement>
 
