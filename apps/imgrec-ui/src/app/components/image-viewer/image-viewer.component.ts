@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon'
 import { ColorUtils, FbnImageRecognitionDetection, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy } from '@ngneat/until-destroy'
 import { FbnObjectFrameComponentData, ObjectFrameComponent } from '../object-frame/object-frame.component'
+import { ObjectViewerComponent } from '../object-viewer/object-viewer.component'
 
 export interface ImageViewerConfig {
   /** base64 encoded image URL */
@@ -30,6 +31,7 @@ export interface ImageViewerConfig {
     CommonModule,
     MatIconModule,
     ObjectFrameComponent,
+    ObjectViewerComponent,
   ],
 })
 export class ImageViewerComponent implements OnChanges {
