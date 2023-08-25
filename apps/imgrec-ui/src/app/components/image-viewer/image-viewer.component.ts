@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChange, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChange, ViewChild, ViewChildren } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { ColorUtils, FbnImageRecognitionDetection, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy } from '@ngneat/until-destroy'
@@ -49,6 +49,10 @@ export class ImageViewerComponent implements OnChanges {
   objectFrameIsHovered = false
   objectFrameIsEnlarged = false
 
+  @ViewChildren(ObjectFrameComponent) objectFrames?: QueryList<ObjectFrameComponent>
+  objectViewerImageDataUrl?: string
+  objectViewerObjectData?: FbnImageRecognitionDetection
+
   constructor(
     private cd: ChangeDetectorRef,
   ) { }
@@ -89,53 +93,18 @@ export class ImageViewerComponent implements OnChanges {
     return item.data.id
   }
 
-  toggleEnlarge(objectData: FbnObjectFrameComponentData): void {
-    if (!this.userImage?.nativeElement || !this.config?.imageInstance) {
-      return
-    }
-  
-    const isLandscape = objectData.width > objectData.height
-    const widthHeightDifference = Math.abs(objectData.width - objectData.height)
-    const isNearlySquare = widthHeightDifference < 40
-    const margin = isNearlySquare ? 200 : 50 // Constant margin in pixels
-    const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userImage.nativeElement)
-  
-    if (objectData.enlarged) {
-      // revert to original size
-      objectData.width = objectData.data.box.w * computedImageWidth
-      objectData.height = objectData.data.box.h * computedImageHeight
-      objectData.left = (objectData.data.box.x * computedImageWidth) - ((objectData.data.box.w * computedImageWidth) / 2)
-      objectData.bottom = computedImageHeight - ((objectData.data.box.y * computedImageHeight) + (objectData.data.box.h * computedImageHeight) / 2)
-      objectData.enlarged = false
-      this.objectFrameIsEnlarged = false
-    } else {
-      if (isLandscape) {
-        // get factor of how much computedImageWidth is larger than objectData.width
-        const ratio = (computedImageWidth - margin * 2) / objectData.width
-        const targetWidth = computedImageWidth - margin * 2
-        const targetHeight = objectData.height * ratio
-  
-        objectData.width = targetWidth
-        objectData.height = targetHeight
-        // Calculate centering for landscape frames
-        objectData.left = (computedImageWidth - targetWidth) / 2
-        objectData.bottom = (computedImageHeight - targetHeight) / 2
-      } else {
-        // get factor of how much computedImageHeight is larger than objectData.height
-        const ratio = (computedImageHeight - margin * 2) / objectData.height
-        const targetHeight = computedImageHeight - margin * 2
-        const targetWidth = objectData.width * ratio
-  
-        objectData.width = targetWidth
-        objectData.height = targetHeight
-        // Center horizontally and vertically for portrait frames
-        objectData.left = (computedImageWidth - targetWidth) / 2
-        objectData.bottom = (computedImageHeight - targetHeight) / 2
-      }
-      objectData.enlarged = true
+  toggleEnlarge(objectData?: FbnObjectFrameComponentData): void {
+    if (objectData && !this.objectFrameIsEnlarged) {
+      const objectDetectionCanvas = this.objectFrames?.find((objectFrame) => objectFrame.objectData?.id === objectData.id)?.objectCanvas?.nativeElement
+      // create image from canvas
+      this.objectViewerObjectData = objectData.data
+      this.objectViewerImageDataUrl = objectDetectionCanvas?.toDataURL()
       this.objectFrameIsEnlarged = true
+    } else {
+      this.objectViewerImageDataUrl = undefined
+      this.objectFrameIsEnlarged = false
+      this.objectFrameIsHovered = false
     }
-  
     this.cd.detectChanges()
   }
   

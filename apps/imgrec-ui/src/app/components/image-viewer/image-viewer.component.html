@@ -18,23 +18,9 @@
     [style.width.px]="config?.computedImageWidth"
     [style.height.px]="config?.computedImageHeight"
   >
-    <!-- PLACEHOLDER -->
-    <!-- <div
-      *ngIf="!config?.imageUrl || !isLoading" class="user-image-placeholder"
-      @rowCollapseAnimation
-      (click)="clickPlaceholder.emit()"
-    >
-      <mat-icon
-        class="__icon"
-      >
-        upload
-      </mat-icon>
-      <div class="__label">Upload Image</div>
-    </div> -->
-
     <!-- OBJECT FRAME -->
     <fbn-object-frame
-      *ngFor="let objectData of visualObjects; trackBy:identify"
+      *ngFor="let objectData of visualObjects; trackBy: identify"
       [objectData]="objectData"
       [imageInstance]="config?.imageInstance"
       [hasLoaded]="!!userImage"
@@ -47,3 +33,10 @@
     </fbn-object-frame>
   </div>
 </div>
+<fbn-object-viewer
+  *ngIf="objectViewerImageDataUrl"
+  [objectData]="objectViewerObjectData"
+  [imageSrc]="objectViewerImageDataUrl"
+  (actionClose)="toggleEnlarge()"
+>
+</fbn-object-viewer>

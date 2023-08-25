@@ -1,8 +1,10 @@
 <div
-  #objectViewerContainer class="object-viewer"
   *ngIf="imageSrc"
+  #objectViewerContainer
+  class="object-viewer"
   @rowCollapseAnimation
->
+  (@rowCollapseAnimation.done)="this.hasLoaded.emit(true)"
+  >
   <div class="--menu">
     <h2 class="--title">{{ objectData?.class_name }}</h2>
     <button
@@ -16,7 +18,7 @@
     class="--container"
   >
     <img
-      [src]="imageSrc" alt=""
+      [src]="imageSrc" alt="uploaded image"
       class="--image"
     >
   </div>

@@ -56,6 +56,8 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
   objectViewerImageDataUrl?: string
   objectViewerObjectData?: FbnImageRecognitionDetection
 
+  videoIsPlaying = true
+
   constructor(
     private cd: ChangeDetectorRef,
   ) { }
@@ -66,7 +68,17 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
       this.config.computedImageWidth = computedImageWidth
       this.config.computedImageHeight = computedImageHeight
 
-      this.userVideo.nativeElement.addEventListener('play', () => this.videoOnPlay())
+      this.userVideo.nativeElement.addEventListener('play', () => {
+        this.videoOnPlay()
+      })
+      // On video playing toggle values
+      this.userVideo.nativeElement.onplaying = () => {
+        this.videoIsPlaying = true
+      }
+      // On video pause toggle values
+      this.userVideo.nativeElement.onpause = () => {
+        this.videoIsPlaying = false
+      }
     }
   }
 
@@ -87,10 +99,6 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
         this.config.computedImageHeight = computedImageHeight
       }
     })
-    // initially refresh sub-views
-    // TODO: find a better way to do this
-    this.objectFrameOnMouseOver()
-    this.objectFrameOnMouseLeave()
   }
 
   identify(index: number, item: FbnObjectFrameComponentData) {
@@ -129,15 +137,15 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
 
   imageOverlayOnClicked(): void {
     if (this.userVideo?.nativeElement?.paused) {
-      this.userVideo?.nativeElement?.play()
+      this.playUserVideo()
     } else {
-      this.userVideo?.nativeElement?.pause()
+      this.pauseUserVideo()
     }
   }
 
   objectFrameOnMouseOver(): void {
     this.objectFrameIsHovered = true
-    this.userVideo?.nativeElement?.pause()
+    this.pauseUserVideo()
     this.cd.detectChanges()
   }
 
@@ -146,7 +154,7 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
       return
     }
     this.objectFrameIsHovered = false
-    this.userVideo?.nativeElement?.play()
+    this.playUserVideo()
     this.cd.detectChanges()
   }
 
@@ -155,12 +163,12 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
       const objectDetectionCanvas = this.objectFrames?.find((objectFrame) => objectFrame.objectData?.id === objectData.id)?.objectCanvas?.nativeElement
       // create image from canvas
       this.objectViewerObjectData = objectData.data
-      this.objectViewerImageDataUrl = objectDetectionCanvas?.toDataURL() || ''
-      this.userVideo?.nativeElement?.pause()
+      this.objectViewerImageDataUrl = objectDetectionCanvas?.toDataURL()
+      this.pauseUserVideo()
       this.objectFrameIsEnlarged = true
     } else {
       this.objectViewerImageDataUrl = undefined
-      this.userVideo?.nativeElement?.play()
+      this.playUserVideo()
       this.objectFrameIsEnlarged = false
       this.objectFrameIsHovered = false
     }
@@ -222,7 +230,6 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
       }
     })
 
-
     this.cd.detectChanges()
   }
 
@@ -268,5 +275,19 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
       const distanceB = this.getDistanceFromCenter(b)
       return distanceA - distanceB
     })
+  }
+
+  // Play video function
+  async playUserVideo() {      
+    if (this.userVideo?.nativeElement.paused && !this.videoIsPlaying) {
+      return this.userVideo?.nativeElement.play()
+    }
+  } 
+
+  // Pause video function
+  pauseUserVideo() {     
+    if (!this.userVideo?.nativeElement.paused && this.videoIsPlaying) {
+      this.userVideo?.nativeElement.pause()
+    }
   }
 }
