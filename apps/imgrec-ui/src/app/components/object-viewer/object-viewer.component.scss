@@ -7,9 +7,11 @@
   top: 0;
   right: 0;
   bottom: 0;
-  margin: 2rem;
+  /* margin: 2rem; */
 
-  @include fbn-background();
+  background-color: transparent;
+  background-image: linear-gradient(rgba(#333, 0.7), rgba(#000, 0.7)), linear-gradient(to right, rgba(#333, 0.7), rgba(#000, 0.7));
+  backdrop-filter: blur(10px);
   
   & .--menu {
     display: flex;
@@ -38,11 +40,7 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter:
-      drop-shadow(0 -5px 0 white)
-      drop-shadow(0 5px 0 white)
-      drop-shadow(-5px 0 0 white)
-      drop-shadow(5px 0 0 white);
+    filter: drop-shadow(0 0 1rem black)
   }
 }
 
