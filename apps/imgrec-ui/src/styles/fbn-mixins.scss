@@ -2,10 +2,10 @@
   box-shadow: 0 0 3rem 0.5rem black;
   background-color: transparent;
   border-radius: $border-radius;
-  border-left: 1px solid rgba(200, 200, 200, 0.2);
-  border-bottom: 1px solid rgba(5, 5, 5, 0.1);
-  border-right: 1px solid rgba(5, 5, 5, 0.1);
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-left: 1px solid rgba(200, 200, 200, 0.1);
+  border-bottom: 1px solid rgba(5, 5, 5, 0.03);
+  border-right: 1px solid rgba(5, 5, 5, 0.03);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   background-image: linear-gradient(rgba(#333, 0.7), rgba(#000, 0.7)), linear-gradient(to right, rgba(#333, 0.7), rgba(#000, 0.7));
   backdrop-filter: blur(10px);
 }
