@@ -1,0 +1,8 @@
+@mixin fbn-background($border-color: rgba(white, 0.2), $border-radius: 30px) {
+  box-shadow: 0 0 3rem 0.5rem black;
+  background-color: transparent;
+  border-radius: $border-radius;
+  border: 1px solid $border-color;
+  background-image: linear-gradient(rgba(#333, 0.5), rgba(#000, 0.5)), linear-gradient(to right, rgba(#333, 0.5), rgba(#000, 0.2));
+  backdrop-filter: blur(10px);
+}

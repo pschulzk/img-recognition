@@ -19,7 +19,7 @@
           "apps/imgrec-ui/src/favicon.ico",
           "apps/imgrec-ui/src/assets"
         ],
-        "styles": ["apps/imgrec-ui/src/styles.scss"],
+        "styles": ["apps/imgrec-ui/src/styles/styles.scss"],
         "scripts": []
       },
       "configurations": {

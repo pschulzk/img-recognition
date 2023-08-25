@@ -1,3 +1,5 @@
+@import '../styles/fbn-mixins';
+
 /* OUTER */
 
 .content {
@@ -36,8 +38,9 @@
 
 mat-toolbar {
   position: relative;
-  box-shadow: 0 0 1rem 0.1rem black;
   z-index: 1;
+  /* box-shadow: 0 0 1rem 0.1rem black; */
+  @include fbn-background(transparent, 0);
 }
 
 .title {

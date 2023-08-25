@@ -1,3 +1,5 @@
+@import '../../../styles/fbn-mixins';
+
 .object-viewer {
   position: absolute;
   z-index: 1;
@@ -5,15 +7,16 @@
   top: 0;
   right: 0;
   bottom: 0;
-  margin: auto;
-  background-color: rgba(black, 0.85);
+  margin: 2rem 8rem;
+
+  @include fbn-background();
   
   & .--menu {
     display: flex;
     height: 3.5rem;
     justify-content: space-between;
     align-items: center;
-    padding: 0 3rem;
+    padding: 0 1rem 0 2rem;
 
     & h2.--title {
       margin-bottom: 0;
