@@ -54,6 +54,7 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
 
   @ViewChildren(ObjectFrameComponent) objectFrames?: QueryList<ObjectFrameComponent>
   objectViewerImageDataUrl?: string
+  objectViewerImageDataUrlIsLoading = false
   objectViewerObjectData?: FbnImageRecognitionDetection
 
   videoIsPlaying = true
@@ -158,19 +159,23 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
     this.cd.detectChanges()
   }
 
-  toggleEnlarge(objectData?: FbnObjectFrameComponentData): void {
+  async toggleEnlarge(objectData?: FbnObjectFrameComponentData): Promise<void> {
     if (objectData && !this.objectFrameIsEnlarged) {
-      const objectDetectionCanvas = this.objectFrames?.find((objectFrame) => objectFrame.objectData?.id === objectData.id)?.objectCanvas?.nativeElement
-      // create image from canvas
       this.objectViewerObjectData = objectData.data
-      this.objectViewerImageDataUrl = objectDetectionCanvas?.toDataURL()
-      this.pauseUserVideo()
       this.objectFrameIsEnlarged = true
+      // delegate generating data url to web worker
+      this.objectViewerImageDataUrlIsLoading = true
+      this.objectViewerImageDataUrl = await this.objectFrames?.find((objectFrame) => objectFrame.objectData?.id === objectData.id)?.getCanvasDataURL()
+      if (!this.objectViewerImageDataUrl) {
+        throw new Error('objectDetectionDataUrl not found')
+      }
+      this.pauseUserVideo()
     } else {
-      this.objectViewerImageDataUrl = undefined
-      this.playUserVideo()
       this.objectFrameIsEnlarged = false
+      this.objectViewerImageDataUrl = undefined
+      this.objectViewerObjectData = undefined
       this.objectFrameIsHovered = false
+      this.playUserVideo()
     }
     this.cd.detectChanges()
   }

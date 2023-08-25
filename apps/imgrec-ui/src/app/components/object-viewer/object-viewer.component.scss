@@ -45,3 +45,8 @@
       drop-shadow(5px 0 0 white);
   }
 }
+
+.spinner-container {
+  z-index: 2;
+  background-color: transparent;
+}

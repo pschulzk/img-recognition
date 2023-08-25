@@ -39,7 +39,7 @@ export class ObjectFrameComponent implements OnChanges {
 
   constructor(
     private cd: ChangeDetectorRef,
-  ) { }
+  ) {}
 
   ngOnChanges(): void {
     this.drawImageOnCanvas()
@@ -97,5 +97,33 @@ export class ObjectFrameComponent implements OnChanges {
       )
       this.cd.detectChanges()
     }
+  }
+
+  /**
+   * Get the canvas data url. This is done in a web worker to prevent blocking the main thread, since
+   * generating data url is rather resource intensive and can cause the UI to freeze.
+   * @param canvasToImageQuality The quality of the generated image
+  */
+  async getCanvasDataURL(canvasToImageQuality = 1): Promise<string> {
+    if (!this.objectCanvas) {
+      throw new Error('objectCanvas not found')
+    }
+    const canvasWorker = new Worker(new URL('../../canvas-worker.worker', import.meta.url), { type: 'module' })
+    const workerResponse = new Promise<string>((resolve) => {
+      canvasWorker.onmessage = (event) => {
+        resolve(event.data)
+      }
+    })
+    // prepare image data for web worker
+    this.objectCanvas.nativeElement.toBlob((imageBlob) => {
+      if (!imageBlob) {
+        throw new Error('Image blob not defined')
+      }
+      canvasWorker.postMessage({
+        imageBlob,
+      })
+    }, 'image/jpeg', canvasToImageQuality)
+
+    return await workerResponse
   }
 }

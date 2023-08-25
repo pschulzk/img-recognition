@@ -50,8 +50,9 @@ export class ImageViewerComponent implements OnChanges {
   objectFrameIsEnlarged = false
 
   @ViewChildren(ObjectFrameComponent) objectFrames?: QueryList<ObjectFrameComponent>
-  objectViewerImageDataUrl?: string
   objectViewerObjectData?: FbnImageRecognitionDetection
+  objectViewerImageDataUrl?: string
+  objectViewerImageDataUrlIsLoading = false
 
   constructor(
     private cd: ChangeDetectorRef,
@@ -93,22 +94,25 @@ export class ImageViewerComponent implements OnChanges {
     return item.data.id
   }
 
-  toggleEnlarge(objectData?: FbnObjectFrameComponentData): void {
+  async toggleEnlarge(objectData?: FbnObjectFrameComponentData): Promise<void> {
     if (objectData && !this.objectFrameIsEnlarged) {
-      const objectDetectionCanvas = this.objectFrames?.find((objectFrame) => objectFrame.objectData?.id === objectData.id)?.objectCanvas?.nativeElement
-      // create image from canvas
       this.objectViewerObjectData = objectData.data
-      this.objectViewerImageDataUrl = objectDetectionCanvas?.toDataURL()
       this.objectFrameIsEnlarged = true
+      // delegate generating data url to web worker
+      this.objectViewerImageDataUrlIsLoading = true
+      this.objectViewerImageDataUrl = await this.objectFrames?.find((objectFrame) => objectFrame.objectData?.id === objectData.id)?.getCanvasDataURL()
+      if (!this.objectViewerImageDataUrl) {
+        throw new Error('objectDetectionDataUrl not found')
+      }
     } else {
-      this.objectViewerImageDataUrl = undefined
       this.objectFrameIsEnlarged = false
+      this.objectViewerImageDataUrl = undefined
+      this.objectViewerObjectData = undefined
       this.objectFrameIsHovered = false
     }
     this.cd.detectChanges()
   }
   
-
   private getContainedSize(img: HTMLImageElement): { computedImageWidth: number, computedImageHeight: number } {
     const ratio = img.naturalWidth/img.naturalHeight
     let computedImageWidth = img.height * ratio
