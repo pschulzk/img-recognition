@@ -43,6 +43,7 @@ $dark-theme: mat.define-dark-theme((
 /* GLOBAL INCLUDES */
 @include mat.typography-hierarchy($default-typography);
 @include mat.all-component-themes($light-theme);
+@include mat.all-component-densities(-2);
 
 html, body {
   height: 100%;
