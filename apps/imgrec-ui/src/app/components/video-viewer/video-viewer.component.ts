@@ -41,8 +41,6 @@ export class VideoViewerComponent implements OnChanges {
   @Input() isLoading = false
 
   @Input() config?: VideoViewerConfig
-
-  @Output() clickPlaceholder = new EventEmitter<void>()
   
   @ViewChild('userVideo', { static: false, read: ElementRef }) userVideo?: ElementRef<HTMLVideoElement>
 

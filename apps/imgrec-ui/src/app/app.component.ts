@@ -96,23 +96,35 @@ export class AppComponent implements OnInit {
       this.cd.detectChanges()
     })
 
-    this.initVideoDemo()
+    this.initDemoVideo()
+  }
+
+  fileInputChange(fileInputEvent: Event) {
+    const element = fileInputEvent.currentTarget as HTMLInputElement
+    const fileList: FileList | null = element.files
+    if (!fileList?.item(0)) {
+      throw new Error('No files selected')
+    }
+    const uploadedFile = fileList.item(0) as File
+    if (uploadedFile.type.startsWith('image')) {
+      this.imageInputChange(uploadedFile)
+    } else if (uploadedFile.type.startsWith('video')) {
+      this.videoInputChange(uploadedFile)
+    } else {
+      this.openDialog({
+        title: 'Error',
+        content: 'Please upload an image or video file',
+      })
+    }
   }
 
   /**
    * Handle image file input change event triggered by user.
    * @param fileInputEvent image file input change event
    */
-  imageInputChange(fileInputEvent: Event) {
+  private imageInputChange(uploadedImageFile: File) {
     this.reset()
-    // read uploaded image file from event
-    const element = fileInputEvent.currentTarget as HTMLInputElement
-    const fileList: FileList | null = element.files
-    if (!fileList?.item(0)) {
-      throw new Error('No files selected')
-    }
-    const uploadedImageFile = fileList.item(0) as File
-
+    this.cd.detectChanges()
     // generate img src URL
     const reader = new FileReader()
     reader.readAsDataURL(uploadedImageFile) 
@@ -122,6 +134,7 @@ export class AppComponent implements OnInit {
       imageInstance.src = reader.result as string
       imageInstance.onload = () => {
         this.imageInstance$.next(imageInstance)
+        this.cd.detectChanges()
       }
     }
 
@@ -148,16 +161,9 @@ export class AppComponent implements OnInit {
    * Handle video file input change event triggered by user.
    * @param fileInputEvent video file input change event
    */
-  videoInputChange(fileInputEvent: Event) {
+  private videoInputChange(uploadedVideoFile: File) {
     this.reset()
-    // read uploaded video file from event
-    const element = fileInputEvent.currentTarget as HTMLInputElement
-    const fileList: FileList | null = element.files
-    if (!fileList?.item(0)) {
-      throw new Error('No files selected')
-    }
-    const uploadedVideoFile = fileList.item(0) as File
-
+    this.cd.detectChanges()
     // generate img src URL
     const reader = new FileReader()
     reader.readAsDataURL(uploadedVideoFile) 
@@ -167,6 +173,7 @@ export class AppComponent implements OnInit {
       videoInstance.src = reader.result as string
       videoInstance.onloadeddata = () => {
         this.videoInstance$.next(videoInstance)
+        this.cd.detectChanges()
       }
     }
 
@@ -220,7 +227,7 @@ export class AppComponent implements OnInit {
   openInfoDialog() {
     this.openDialog({
       title: 'Info',
-      content: 'This application is for demoing object recognition in images. Please upload an image of type JPG and see the results.',
+      content: 'This application is for demoing object recognition in images and videos. Please upload an image of type JPG or MP4 to see the results. Maximum upload file size is 4MB.',
     })
   }
 
@@ -267,7 +274,7 @@ export class AppComponent implements OnInit {
   /**
    * Initialize video demo data.
    */
-  private initVideoDemo() {
+  private initDemoVideo() {
     this.reset()
     this.isLoading$.next(true)
     this.requestSubscriptions$.push(forkJoin([
