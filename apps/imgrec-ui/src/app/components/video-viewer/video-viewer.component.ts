@@ -36,7 +36,7 @@ export interface VideoViewerConfig {
     ObjectViewerComponent,
   ],
 })
-export class VideoViewerComponent implements AfterViewInit, OnChanges {
+export class VideoViewerComponent implements OnChanges {
 
   @Input() isLoading = false
 
@@ -63,26 +63,6 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
     private cd: ChangeDetectorRef,
   ) { }
 
-  ngAfterViewInit(): void {
-    if (this.userVideo?.nativeElement && this.config) {
-      const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
-      this.config.computedImageWidth = computedImageWidth
-      this.config.computedImageHeight = computedImageHeight
-
-      this.userVideo.nativeElement.addEventListener('play', () => {
-        this.videoOnPlay()
-      })
-      // On video playing toggle values
-      this.userVideo.nativeElement.onplaying = () => {
-        this.videoIsPlaying = true
-      }
-      // On video pause toggle values
-      this.userVideo.nativeElement.onpause = () => {
-        this.videoIsPlaying = false
-      }
-    }
-  }
-
   ngOnChanges(changes: {
     [key in keyof this]: SimpleChange
   }): void {
@@ -98,6 +78,18 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
         const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
         this.config.computedImageWidth = computedImageWidth
         this.config.computedImageHeight = computedImageHeight
+
+        this.userVideo.nativeElement.addEventListener('play', () => {
+          this.videoOnPlay()
+        })
+        // On video playing toggle values
+        this.userVideo.nativeElement.onplaying = () => {
+          this.videoIsPlaying = true
+        }
+        // On video pause toggle values
+        this.userVideo.nativeElement.onpause = () => {
+          this.videoIsPlaying = false
+        }
       }
     })
   }
