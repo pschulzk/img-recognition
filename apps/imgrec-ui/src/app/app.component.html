@@ -3,31 +3,26 @@
     <!-- <button mat-icon-button aria-label="Example icon-button with menu icon">
       <mat-icon>menu</mat-icon>
     </button> -->
-    <span class="title">Object Detection</span>
+    <a
+      class="title"
+      href="/"
+    >
+      Object Detection
+    </a>
     
     <span class="spacer"></span>
     <div class="flex-stretch"></div>
 
-    <!-- UPLOAD IMAGE -->
-    <input #imageInput hidden="true" type="file" onclick="this.value=null" (change)="imageInputChange($event)" accept=".jpg"/>
+    <!-- UPLOAD FILE -->
+    <input #fileInput hidden="true" type="file" onclick="this.value=null" (change)="fileInputChange($event)" accept="image/jpg, video/mp4"/>
     <button
       mat-raised-button
       color="primary"
-      (click)="imageInput.click()"
+      title="Let AI perform Object Detection on your uploaded JPG or MP4 file"
+      (click)="fileInput.click()"
     >
       <mat-icon>upload</mat-icon>
-      Upload Image
-    </button>
-
-    <!-- UPLOAD VIDEO -->
-    <input #videoInput hidden="true" type="file" onclick="this.value=null" (change)="videoInputChange($event)" accept=".mp4"/>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="videoInput.click()"
-    >
-      <mat-icon>upload</mat-icon>
-      Upload Video
+      Upload file for Object Detection
     </button>
 
     <!-- RESET -->
@@ -66,20 +61,11 @@
   </mat-toolbar>
 
   <div class="wrapper">
-    <div
-      *ngIf="isLoading$ | async"
-      @rowCollapseAnimation
-      class="spinner-container"
-    >
-      <mat-spinner></mat-spinner>
-    </div>
-
     <div class="container">
       <fbn-image-viewer
         *ngIf="imageUrl$ | async"
         [isLoading]="(isLoading$ | async) || false"
         [config]="imageViewerConfig"
-        (clickPlaceholder)="imageInput.click()"
       >
       </fbn-image-viewer>
 
@@ -87,9 +73,16 @@
         *ngIf="videoUrl$ | async"
         [isLoading]="(isLoading$ | async) || false"
         [config]="videoViewerConfig"
-        (clickPlaceholder)="videoInput.click()"
       >
       </fbn-video-viewer>
+    </div>
+
+    <div
+      *ngIf="isLoading$ | async"
+      class="spinner-container"
+      @rowCollapseAnimation
+    >
+      <mat-spinner></mat-spinner>
     </div>
   </div>
 </div>

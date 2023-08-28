@@ -1,10 +1,6 @@
-/* OUTER */
+@import '../styles/fbn-mixins';
 
-mat-toolbar {
-  position: relative;
-  box-shadow: 0 0 1rem 0.1rem black;
-  z-index: 1;
-}
+/* OUTER */
 
 .content {
   min-height: 100%;
@@ -15,35 +11,19 @@ mat-toolbar {
   position: relative;
 }
 
-.container {
-  /* margin-left: auto;
-  margin-right: auto;
-  max-width: calc(100% - 2rem);
-  padding-left: 1rem;
-  padding-right: 1rem; */
-}
-
-.spinner-container {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  
-  background-color: rgba(white, 0.5);
-  z-index: 1;
-  display: flex;
-  align-content: center;
-  align-items: center;
-  justify-content: center;
-}
-
 /* INNER */
 
-.title {
+mat-toolbar {
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 0 1rem 0.1rem black;
+}
+
+a.title {
   margin-left: 1rem;
   margin-right: 1rem;
+  text-decoration: none;
+  color: inherit;
 }
 
 .spacer {
@@ -64,9 +44,3 @@ mat-toolbar {
     padding: 0 1rem;
   }
 }
-
-/* .message {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-} */

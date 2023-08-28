@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common'
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChange, ViewChild } from '@angular/core'
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChange, ViewChild, ViewChildren } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { ColorUtils, FbnImageRecognitionDetection, FbnImageRecognitionDetectionFrame, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy } from '@ngneat/until-destroy'
-import { ObjectFrameComponent, VisualObjectData } from '../object-frame/object-frame.component'
+import { FbnObjectFrameComponentData, ObjectFrameComponent } from '../object-frame/object-frame.component'
+import { ObjectViewerComponent } from '../object-viewer/object-viewer.component'
 
 export interface VideoViewerConfig {
   /** base64 encoded image URL */
@@ -32,44 +33,40 @@ export interface VideoViewerConfig {
     CommonModule,
     MatIconModule,
     ObjectFrameComponent,
+    ObjectViewerComponent,
   ],
 })
-export class VideoViewerComponent implements AfterViewInit, OnChanges {
+export class VideoViewerComponent implements OnChanges {
 
   @Input() isLoading = false
 
   @Input() config?: VideoViewerConfig
-
-  @Output() clickPlaceholder = new EventEmitter<void>()
   
   @ViewChild('userVideo', { static: false, read: ElementRef }) userVideo?: ElementRef<HTMLVideoElement>
 
-  visualObjects: VisualObjectData[] = []
+  visualObjects: FbnObjectFrameComponentData[] = []
   currentFrameNumber = 0
 
   objectFrameIsHovered = false
   objectFrameIsEnlarged = false
 
+  @ViewChildren(ObjectFrameComponent) objectFrames?: QueryList<ObjectFrameComponent>
+  objectViewerImageDataUrl?: string
+  objectViewerImageDataUrlIsLoading = false
+  objectViewerObjectData?: FbnImageRecognitionDetection
+
+  videoIsPlaying = true
+
   constructor(
     private cd: ChangeDetectorRef,
   ) { }
-
-  ngAfterViewInit(): void {
-    if (this.userVideo?.nativeElement && this.config) {
-      const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
-      this.config.computedImageWidth = computedImageWidth
-      this.config.computedImageHeight = computedImageHeight
-
-      this.userVideo.nativeElement.addEventListener('play', () => this.videoOnPlay())
-    }
-  }
 
   ngOnChanges(changes: {
     [key in keyof this]: SimpleChange
   }): void {
     setTimeout(() => {
       if (changes.config?.previousValue !== changes.config?.currentValue && this.config) {
-      // reset value
+        // reset value
         this.visualObjects = []
   
         if (!this.userVideo?.nativeElement) {
@@ -79,18 +76,30 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
         const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
         this.config.computedImageWidth = computedImageWidth
         this.config.computedImageHeight = computedImageHeight
+
+        this.userVideo.nativeElement.addEventListener('play', () => {
+          this.videoOnPlay()
+        })
+        // On video playing toggle values
+        this.userVideo.nativeElement.onplaying = () => {
+          this.videoIsPlaying = true
+        }
+        // On video pause toggle values
+        this.userVideo.nativeElement.onpause = () => {
+          this.videoIsPlaying = false
+        }
       }
     })
   }
 
-  identify(index: number, item: VisualObjectData) {
+  identify(index: number, item: FbnObjectFrameComponentData) {
     return item.data.id
   }
 
   videoOnPlay(): void {
     if (this.userVideo) {
       const video: HTMLVideoElement = this.userVideo.nativeElement
-      this.visualObjects = []
+      // this.visualObjects = []
       video.requestVideoFrameCallback((timestamp, videoFrameCallbackMetadata) => this.videoFrameCallback(timestamp, videoFrameCallbackMetadata, video))
     }
   }
@@ -119,15 +128,15 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
 
   imageOverlayOnClicked(): void {
     if (this.userVideo?.nativeElement?.paused) {
-      this.userVideo?.nativeElement?.play()
+      this.playUserVideo()
     } else {
-      this.userVideo?.nativeElement?.pause()
+      this.pauseUserVideo()
     }
   }
 
   objectFrameOnMouseOver(): void {
     this.objectFrameIsHovered = true
-    this.userVideo?.nativeElement?.pause()
+    this.pauseUserVideo()
     this.cd.detectChanges()
   }
 
@@ -136,59 +145,28 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
       return
     }
     this.objectFrameIsHovered = false
-    this.userVideo?.nativeElement?.play()
+    this.playUserVideo()
     this.cd.detectChanges()
   }
 
-  toggleEnlarge(objectData: VisualObjectData): void {
-    if (!this.userVideo?.nativeElement || !this.config?.videoInstance) {
-      return
-    }
-  
-    const isLandscape = objectData.width > objectData.height
-    const widthHeightDifference = Math.abs(objectData.width - objectData.height)
-    const isNearlySquare = widthHeightDifference < 75
-    const margin = isNearlySquare ? 350 : 80 // Constant margin in pixels
-    const { computedImageWidth, computedImageHeight } = this.getContainedSize(this.userVideo.nativeElement)
-  
-    if (objectData.enlarged) {
-      // revert to original size
-      objectData.width = objectData.data.box.w * computedImageWidth
-      objectData.height = objectData.data.box.h * computedImageHeight
-      objectData.left = (objectData.data.box.x * computedImageWidth) - ((objectData.data.box.w * computedImageWidth) / 2)
-      objectData.bottom = computedImageHeight - ((objectData.data.box.y * computedImageHeight) + (objectData.data.box.h * computedImageHeight) / 2)
-      objectData.enlarged = false
-      this.objectFrameIsEnlarged = false
-    } else {
-      if (isLandscape) {
-        // get factor of how much computedImageWidth is larger than objectData.width
-        const ratio = (computedImageWidth - margin * 2) / objectData.width
-        const targetWidth = computedImageWidth - margin * 2
-        const targetHeight = objectData.height * ratio
-  
-        objectData.width = targetWidth
-        objectData.height = targetHeight
-        // Calculate centering for landscape frames
-        objectData.left = (computedImageWidth - targetWidth) / 2
-        objectData.bottom = (computedImageHeight - targetHeight) / 2
-      } else {
-        // get factor of how much computedImageHeight is larger than objectData.height
-        const ratio = (computedImageHeight - margin * 2) / objectData.height
-        const targetHeight = computedImageHeight - margin * 2
-        const targetWidth = objectData.width * ratio
-  
-        objectData.width = targetWidth
-        objectData.height = targetHeight
-        // Center horizontally and vertically for portrait frames
-        objectData.left = (computedImageWidth - targetWidth) / 2
-        objectData.bottom = (computedImageHeight - targetHeight) / 2
-      }
-      objectData.enlarged = true
+  async toggleEnlarge(objectData?: FbnObjectFrameComponentData): Promise<void> {
+    if (objectData && !this.objectFrameIsEnlarged) {
+      this.objectViewerObjectData = objectData.data
       this.objectFrameIsEnlarged = true
+      // delegate generating data url to web worker
+      this.objectViewerImageDataUrlIsLoading = true
+      this.objectViewerImageDataUrl = await this.objectFrames?.find((objectFrame) => objectFrame.objectData?.id === objectData.id)?.getCanvasDataURL()
+      if (!this.objectViewerImageDataUrl) {
+        throw new Error('objectDetectionDataUrl not found')
+      }
+      this.pauseUserVideo()
+    } else {
+      this.objectFrameIsEnlarged = false
+      this.objectViewerImageDataUrl = undefined
+      this.objectViewerObjectData = undefined
+      this.objectFrameIsHovered = false
+      this.playUserVideo()
     }
-  
-    // clean up
-    this.objectFrameIsHovered = false
     this.cd.detectChanges()
   }
 
@@ -206,65 +184,46 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
     computedImageHeight: number,
     enabledObjectTracking = false,
   ): void {
-    if (enabledObjectTracking) {
-      const indicesToRemove: number[] = []
+    const indicesToRemove: number[] = []
 
-      // Update properties of existing objects and retain their instances
-      this.visualObjects.forEach((prevDetection, index) => {
-        const existingDetection = nextDetections.find(nextDetection => nextDetection.id === prevDetection.id)
-        if (existingDetection) {
-          prevDetection.data = existingDetection
-          prevDetection.width = existingDetection.box.w * computedImageWidth
-          prevDetection.height = existingDetection.box.h * computedImageHeight
-          prevDetection.left = (existingDetection.box.x * computedImageWidth) - ((existingDetection.box.w * computedImageWidth) / 2)
-          prevDetection.bottom = computedImageHeight - ((existingDetection.box.y * computedImageHeight) + (existingDetection.box.h * computedImageHeight) / 2)
-          prevDetection.opacity = existingDetection.confidence < 0.8 ? 0.4 : 1
-        } else {
-          // store indices of objects to remove
-          indicesToRemove.push(index)
-        }
-      })
+    // Update properties of existing objects and retain their instances
+    this.visualObjects.forEach((prevDetection, index) => {
+      const existingDetection = nextDetections.find(nextDetection => nextDetection.id === prevDetection.id)
+      if (existingDetection) {
+        prevDetection.data = existingDetection
+        prevDetection.width = existingDetection.box.w * computedImageWidth
+        prevDetection.height = existingDetection.box.h * computedImageHeight
+        prevDetection.left = (existingDetection.box.x * computedImageWidth) - ((existingDetection.box.w * computedImageWidth) / 2)
+        prevDetection.bottom = computedImageHeight - ((existingDetection.box.y * computedImageHeight) + (existingDetection.box.h * computedImageHeight) / 2)
+        prevDetection.opacity = existingDetection.confidence < 0.8 ? 0.4 : 1
+      } else {
+        // store indices of objects to remove
+        indicesToRemove.push(index)
+      }
+    })
   
-      // remove objects
-      indicesToRemove.forEach((index) => {
-        this.visualObjects.splice(index, 1)
-      })
+    // remove objects
+    indicesToRemove.forEach((index) => {
+      this.visualObjects.splice(index, 1)
+    })
   
-      // Add new detections
-      nextDetections.forEach((nextDetection) => {
-        const detectionExists = this.visualObjects.some(obj => obj.data.id === nextDetection.id)
-        if (!detectionExists) {
-          this.visualObjects.push({
-            data: nextDetection,
-            width: nextDetection.box.w * computedImageWidth,
-            height: nextDetection.box.h * computedImageHeight,
-            left: (nextDetection.box.x * computedImageWidth) - ((nextDetection.box.w * computedImageWidth) / 2),
-            bottom: computedImageHeight - ((nextDetection.box.y * computedImageHeight) + (nextDetection.box.h * computedImageHeight) / 2),
-            color: ColorUtils.getRandomBrightColor(nextDetection.id),
-            opacity: nextDetection.confidence < 0.8 ? 0.4 : 1,
-            enlarged: false,
-            id: nextDetection.id,
-          })
-        }
-      })
-    } else {
-      // reset visual objects
-      this.visualObjects = []
-      // Add new detections
-      nextDetections.forEach((nextDetection) => {
+    // Add new detections
+    nextDetections.forEach((nextDetection) => {
+      const detectionExists = this.visualObjects.some(obj => obj.data.id === nextDetection.id)
+      if (!detectionExists) {
         this.visualObjects.push({
           data: nextDetection,
           width: nextDetection.box.w * computedImageWidth,
           height: nextDetection.box.h * computedImageHeight,
           left: (nextDetection.box.x * computedImageWidth) - ((nextDetection.box.w * computedImageWidth) / 2),
           bottom: computedImageHeight - ((nextDetection.box.y * computedImageHeight) + (nextDetection.box.h * computedImageHeight) / 2),
-          color: '#fff',
+          color: enabledObjectTracking ? ColorUtils.getRandomBrightColor(nextDetection.id): 'white',
           opacity: nextDetection.confidence < 0.8 ? 0.4 : 1,
           enlarged: false,
           id: nextDetection.id,
         })
-      })
-    }
+      }
+    })
 
     this.cd.detectChanges()
   }
@@ -311,5 +270,17 @@ export class VideoViewerComponent implements AfterViewInit, OnChanges {
       const distanceB = this.getDistanceFromCenter(b)
       return distanceA - distanceB
     })
+  }
+
+  async playUserVideo() {      
+    if (this.userVideo?.nativeElement.paused && !this.videoIsPlaying) {
+      return await this.userVideo?.nativeElement.play()
+    }
+  } 
+
+  pauseUserVideo() {     
+    if (!this.userVideo?.nativeElement.paused && this.videoIsPlaying) {
+      this.userVideo?.nativeElement.pause()
+    }
   }
 }

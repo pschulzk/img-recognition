@@ -1,0 +1,36 @@
+<div
+  *ngIf="objectData"
+  @rowCollapseAnimation
+  #objectViewerContainer
+  class="object-viewer"
+>
+  <div
+    class="--menu"
+  >
+    <h2 class="--title">{{ objectData.class_name }}</h2>
+    <button
+      mat-icon-button
+      (click)="close()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div
+    *ngIf="imageSrc"
+    @rowCollapseAnimation
+    class="--container"
+  >
+    <img
+      class="--image"
+      [src]="imageSrc"
+      alt="uploaded image"
+    >
+  </div>
+
+  <div
+    *ngIf="!imageSrc"
+    class="spinner-container"
+  >
+    <mat-spinner></mat-spinner>
+  </div>
+</div>

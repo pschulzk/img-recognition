@@ -14,6 +14,7 @@ import { DialogComponent } from './components/dialog/dialog.component'
 import { ObjectFrameComponent } from './components/object-frame/object-frame.component'
 import { ImageViewerComponent } from './components/image-viewer/image-viewer.component'
 import { VideoViewerComponent } from './components/video-viewer/video-viewer.component'
+import { ObjectViewerComponent } from './components/object-viewer/object-viewer.component'
 
 @NgModule({
   declarations: [AppComponent, DialogComponent],
@@ -33,6 +34,7 @@ import { VideoViewerComponent } from './components/video-viewer/video-viewer.com
     ImageViewerComponent,
     VideoViewerComponent,
     ObjectFrameComponent,
+    ObjectViewerComponent,
   ],
   bootstrap: [AppComponent],
 })
