@@ -37,7 +37,9 @@ export class AppComponent implements OnInit {
    */
   videoTrackingThreshold = 0
 
-  showInfo = false
+  showSideNav = false
+
+  showInfoOverlay = false
 
   isDarkTheme = true
 
@@ -207,8 +209,9 @@ export class AppComponent implements OnInit {
    * Reset all data streams and cancel all pending http requests.
    */
   reset() {
-    // cloase info dialog
-    this.showInfo = false
+    // close all overlays
+    this.showInfoOverlay = false
+    this.showSideNav = false
     // cancel all pending http requests
     this.requestSubscriptions$.forEach((subscription) => subscription.unsubscribe())
     // reset all configs streams
@@ -231,7 +234,8 @@ export class AppComponent implements OnInit {
   }
 
   openInfo() {
-    this.showInfo = true
+    this.showSideNav = false
+    this.showInfoOverlay = true
   }
 
   /**

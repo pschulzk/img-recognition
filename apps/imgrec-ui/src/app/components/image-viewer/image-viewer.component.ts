@@ -85,7 +85,6 @@ export class ImageViewerComponent implements OnChanges {
         }
       })
       this.cd.detectChanges()
-      console.log('!!! this.visualObjects', this.visualObjects);
     }
   }
 
