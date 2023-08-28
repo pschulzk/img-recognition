@@ -1,4 +1,4 @@
-<div class="content mat-app-background" [class.dark-theme]="isDarkTheme">
+<div class="app-container mat-app-background" [class.dark-theme]="isDarkTheme">
   <mat-toolbar color="primary">
     <!-- <button mat-icon-button aria-label="Example icon-button with menu icon">
       <mat-icon>menu</mat-icon>
@@ -40,7 +40,7 @@
     <button
       mat-raised-button
       color="primary"
-      (click)="openInfoDialog()"
+      (click)="openInfo()"
     >
       <mat-icon>help_outlined</mat-icon> 
       Info
@@ -84,5 +84,56 @@
     >
       <mat-spinner></mat-spinner>
     </div>
+
+    <!-- INFO OVERLAY -->
+    <div
+      *ngIf="showInfo"
+      @rowCollapseAnimation
+      class="info-overlay mat-app-background"
+      [class.dark-theme]="isDarkTheme"
+    >
+      <div
+        class="--menu"
+      >
+        <button
+          mat-icon-button
+          (click)="showInfo = false"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="--content">
+        <h1>Demo Application for Machine Learning-based Object Detection</h1>
+        
+        <h2>How to use</h2>
+        <p>
+          Upload a JPG or MP4 file to have Object Detection performed on it.
+          The AI will draw bounding boxes around the detected objects. Clicking or tapping on a bounding box will show enlarge the detected object.
+        </p>
+        <br>
+        
+        <h2>Disclamer</h2>
+        <p>
+          This is a demo application for demonstration and educational purposes only. It is not intended for production use or any real-world application.
+          The authors do not take any responsibility for the correctness of the results or any other damages caused by the use of this application.
+        </p>
+        <br>
+
+        <h2>Uploaded data</h2>
+        <p>
+          Files uploaded are not processed in any other way except for the purposes of this demontrationial app.
+          Image files are not stored on the server and are only processed in the browser.
+          Video files are stored on the server for the duration of the processing and are deleted afterwards.
+        </p>
+        
+        <h2>Authors</h2>
+        <ul>
+          <li><a href="https://www.linkedin.com/in/philip-schulz-klingauf-1a10ba126/" target="_blank">Philip Schulz-Klingauf</a></li>
+          <li><a href="https://www.linkedin.com/in/niklas-unverricht-7494a8198/" target="_blank">Niklas Unverricht</a></li>
+        </ul>
+      </div>
+    </div>
+
   </div>
 </div>

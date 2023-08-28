@@ -37,6 +37,8 @@ export class AppComponent implements OnInit {
    */
   videoTrackingThreshold = 0
 
+  showInfo = false
+
   isDarkTheme = true
 
   private requestSubscriptions$: Subscription[] = []
@@ -205,14 +207,18 @@ export class AppComponent implements OnInit {
    * Reset all data streams and cancel all pending http requests.
    */
   reset() {
+    // cloase info dialog
+    this.showInfo = false
     // cancel all pending http requests
     this.requestSubscriptions$.forEach((subscription) => subscription.unsubscribe())
+    // reset all configs streams
     this.imageUrl$.next(undefined)
     this.videoUrl$.next(undefined)
     this.imageViewerConfig = undefined
     this.videoViewerConfig = undefined
     this.imageObjectDetections$.next([])
     this.videoObjectDetectionResponse$.next(undefined)
+    // apply changes
     this.cd.detectChanges()
   }
 
@@ -224,11 +230,8 @@ export class AppComponent implements OnInit {
     this.isDarkTheme = event.checked
   }
 
-  openInfoDialog() {
-    this.openDialog({
-      title: 'Info',
-      content: 'This application is for demoing object recognition in images and videos. Please upload an image of type JPG or MP4 to see the results. Maximum upload file size is 4MB.',
-    })
+  openInfo() {
+    this.showInfo = true
   }
 
   /**
