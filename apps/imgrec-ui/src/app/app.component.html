@@ -50,10 +50,11 @@
 <!-- APP COMPONENT -->
 <div class="app-container mat-app-background" [class.dark-theme]="isDarkTheme">
 
-  <!-- TOOLBAR DESKTOP -->
+  <!-- TOOL BAR DESKTOP -->
   <mat-toolbar color="primary">
     <button
       mat-icon-button
+      class="hidden-xs"
       aria-label="Application menu button"
       (click)="showSideNav = !showSideNav"
     >
@@ -69,19 +70,24 @@
     <span class="spacer"></span>
     <div class="flex-stretch"></div>
 
-    <ng-container [ngTemplateOutlet]="menuButtons"></ng-container>
+    <div class="button-bar hidden-sm">
+      <ng-container [ngTemplateOutlet]="menuButtons">
+      </ng-container>
+    </div>
   </mat-toolbar>
 
   <div class="wrapper">
 
-    <!-- TOOLBAR MOBILE -->
-    <mat-sidenav-container class="sidenav-container">
+    <!-- TOOL BAR MOBILE -->
+    <mat-sidenav-container
+      class="sidenav-container"
+    >
       <mat-sidenav
         class="sidenav"
         color="primary"
-        fxLayout="column"
-        mode="over"
+        mode="side"
         [opened]="showSideNav"
+        (closedStart)="showSideNav = false"
       >
         <div class="sidenav-menu">
           <ng-container [ngTemplateOutlet]="menuButtons"></ng-container>

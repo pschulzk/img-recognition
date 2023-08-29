@@ -9,3 +9,17 @@
   background-image: linear-gradient(rgba(#333, 0.7), rgba(#000, 0.7)), linear-gradient(to right, rgba(#333, 0.7), rgba(#000, 0.7));
   backdrop-filter: blur(10px);
 }
+
+// helper class for elements hidden on mobile and small screen sizes
+.hidden-sm {
+  @media (max-width: 767px) {
+    display: none !important;
+  }
+}
+
+// helper class for elements hidden on medium screen sizes
+.hidden-xs {
+  @media (min-width: 768px) {
+    display: none !important;
+  }
+}
