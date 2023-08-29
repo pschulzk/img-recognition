@@ -12,14 +12,14 @@
 
 // helper class for elements hidden on mobile and small screen sizes
 .hidden-sm {
-  @media (max-width: 767px) {
+  @media (max-width: 1023px) {
     display: none !important;
   }
 }
 
 // helper class for elements hidden on medium screen sizes
 .hidden-xs {
-  @media (min-width: 768px) {
+  @media (min-width: 1024px) {
     display: none !important;
   }
 }

@@ -4,7 +4,7 @@
 /* OUTER ********************************************************************* */
 
 .app-container {
-  height: 100%;
+  height: 100vh;
   overflow: hidden;
   transition:
     background-color 0.15s ease-in-out,
@@ -62,7 +62,7 @@ a.title {
 /* SIDE NAV FOR MOBILE ******************************************************** */
 
 .sidenav-container {
-  overflow: hidden;
+  /* overflow: hidden; */
   height: calc(100vh - 64px);
 
   & .sidenav-menu {

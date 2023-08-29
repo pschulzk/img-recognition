@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChange, ViewChild, ViewChildren } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, QueryList, SimpleChange, ViewChild, ViewChildren } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { ColorUtils, FbnImageRecognitionDetection, FbnImageRecognitionDetectionFrame, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy } from '@ngneat/until-destroy'
@@ -161,12 +161,17 @@ export class VideoViewerComponent implements OnChanges {
       }
       this.pauseUserVideo()
     } else {
-      this.objectFrameIsEnlarged = false
-      this.objectViewerImageDataUrl = undefined
-      this.objectViewerObjectData = undefined
-      this.objectFrameIsHovered = false
+      this.unEnlarge()
       this.playUserVideo()
     }
+    this.cd.detectChanges()
+  }
+
+  unEnlarge(): void {
+    this.objectFrameIsEnlarged = false
+    this.objectViewerImageDataUrl = undefined
+    this.objectViewerObjectData = undefined
+    this.objectFrameIsHovered = false
     this.cd.detectChanges()
   }
 
@@ -276,6 +281,7 @@ export class VideoViewerComponent implements OnChanges {
     if (this.userVideo?.nativeElement.paused && !this.videoIsPlaying) {
       return await this.userVideo?.nativeElement.play()
     }
+    return Promise.resolve()
   } 
 
   pauseUserVideo() {     

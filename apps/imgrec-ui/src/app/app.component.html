@@ -18,15 +18,26 @@
     Upload file for Object Detection
   </button>
 
-  <!-- RESET -->
+  <!-- RESTART -->
+  <button
+    mat-raised-button
+    color="primary"
+    aria-label="Redo"
+    (click)="initDemoVideo()"
+  >
+    <mat-icon>play_arrow_outlined</mat-icon>
+    Restart demo
+  </button>
+
+  <!-- EMPTY -->
   <button
     mat-raised-button
     color="primary"
     aria-label="Redo"
     (click)="reset()"
   >
-    <mat-icon>refresh</mat-icon>
-    Reset
+    <mat-icon>close</mat-icon>
+    Empty View
   </button>
 
   <!-- HELP -->
@@ -62,7 +73,7 @@
       mat-icon-button
       class="hidden-xs"
       aria-label="Application menu button"
-      (click)="showSideNav = !showSideNav"
+      (click)="sideNavClicked()"
     >
       <mat-icon>menu</mat-icon>
     </button>
@@ -91,9 +102,8 @@
       <mat-sidenav
         class="sidenav"
         color="primary"
-        mode="side"
-        [opened]="showSideNav"
-        (closedStart)="showSideNav = false"
+        mode="push"
+        (openedChange)="sideNavOpenedChange($event)"
       >
         <div class="sidenav-menu">
           <ng-container [ngTemplateOutlet]="menuButtons"></ng-container>
