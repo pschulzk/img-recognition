@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   object-detection-service:
-    image: niggi88/object-detection-service:f-video-prediction.1
+    image: niggi88/object-detection-service:f-video-prediction.2
     hostname: object-detection-service
     container_name: object-detection-service
     restart: always
