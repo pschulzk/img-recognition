@@ -6,7 +6,9 @@
 .app-container {
   height: 100%;
   overflow: hidden;
-  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+  transition:
+    background-color 0.15s ease-in-out,
+    color 0.15s ease-in-out;
 }
 
 .wrapper {
@@ -110,9 +112,9 @@ a.title {
   }
 
   & .--content {
-    display: flex;
-    flex-direction: column;
     max-width: var(--content-max-width);
+    overflow-y: auto;
+    padding-bottom: 5rem;
     font-size: 120%;
 
     & ul {

@@ -1,7 +1,13 @@
 <!-- MENU BUTTON TEMPLATE -->
 <ng-template #menuButtons>
   <!-- UPLOAD FILE -->
-  <input #fileInput hidden="true" type="file" onclick="this.value=null" (change)="fileInputChange($event)" accept="image/jpg, video/mp4"/>
+  <input
+    #fileInput
+    hidden="true"
+    type="file"
+    accept="image/jpg, video/mp4"
+    (change)="fileInputChange($event)"
+  />
   <button
     mat-raised-button
     color="primary"
@@ -156,7 +162,7 @@
     
             <h2>Uploaded data</h2>
             <p>
-              Files uploaded are not processed in any other way except for the purposes of this demontrationial app.
+              Files uploaded are not processed in any other way except for the purposes of this app.
               Image files are not stored on the server and are only processed in the browser.
               Video files are stored on the server for the duration of the processing and are deleted afterwards.
             </p>
