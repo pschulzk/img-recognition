@@ -1,6 +1,6 @@
 import { OverlayContainer } from '@angular/cdk/overlay'
 import { HttpClient } from '@angular/common/http'
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core'
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
 import { MatSlideToggleChange } from '@angular/material/slide-toggle'
 import { FbnImageRecognitionDetection, FbnImageRecognitionResponse, FbnVideoRecognitionResponse, rowCollapseAnimation } from '@fbn/fbn-imgrec'
@@ -8,8 +8,9 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy'
 import { BehaviorSubject, Observable, Subscription, catchError, combineLatest, finalize, forkJoin, switchMap, throwError } from 'rxjs'
 import { DialogComponent } from './components/dialog/dialog.component'
 import { ImageViewerConfig } from './components/image-viewer/image-viewer.component'
-import { VideoViewerConfig } from './components/video-viewer/video-viewer.component'
+import { VideoViewerComponent, VideoViewerConfig } from './components/video-viewer/video-viewer.component'
 import { OjectDetectionApiService } from './services/object-detection-api/object-detection-api.service'
+import { MatSidenav } from '@angular/material/sidenav'
 
 @UntilDestroy()
 @Component({
@@ -37,7 +38,16 @@ export class AppComponent implements OnInit {
    */
   videoTrackingThreshold = 0
 
+  // component states
+  showInfoOverlay = false
   isDarkTheme = true
+  videoFunctionalityBrowserSupport = true
+
+  @ViewChild(MatSidenav, { static: false })
+    sideNav?: MatSidenav
+
+  @ViewChild(VideoViewerComponent, { static: false })
+    videoViewerComponent?: VideoViewerComponent
 
   private requestSubscriptions$: Subscription[] = []
 
@@ -50,6 +60,14 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    if (!('requestVideoFrameCallback' in HTMLVideoElement.prototype)) {
+      this.videoFunctionalityBrowserSupport = false
+      this.openErrorDialog({
+        message: 'Your browser does not support the required video features. Therefore, functionality is limited to uploading images only. This application is optimized for the Google Chrome browser.',
+      })
+      this.reset()
+    }
+
     // check if remote service is available
     this.objectDetectionService.getIsHealthy().pipe(
       untilDestroyed(this),
@@ -99,6 +117,24 @@ export class AppComponent implements OnInit {
     this.initDemoVideo()
   }
 
+  sideNavClicked(): void {
+    if (!this.sideNav?.opened) {
+      this.videoViewerComponent?.pauseUserVideo()
+    }
+    this.sideNav?.toggle()
+  }
+
+  sideNavOpenStart() {
+    this.videoViewerComponent?.pauseUserVideo()
+  }
+
+  async sideNavOpenedChange(open: boolean) {
+    if (!open) {
+      this.videoViewerComponent?.unEnlarge()
+      this.videoViewerComponent?.playUserVideo()
+    }
+  }
+
   fileInputChange(fileInputEvent: Event) {
     const element = fileInputEvent.currentTarget as HTMLInputElement
     const fileList: FileList | null = element.files
@@ -118,10 +154,6 @@ export class AppComponent implements OnInit {
     }
   }
 
-  /**
-   * Handle image file input change event triggered by user.
-   * @param fileInputEvent image file input change event
-   */
   private imageInputChange(uploadedImageFile: File) {
     this.reset()
     this.cd.detectChanges()
@@ -150,6 +182,9 @@ export class AppComponent implements OnInit {
     ).subscribe(
       (response: FbnImageRecognitionResponse) => {
         if (response.detections.length === 0) {
+          this.openErrorDialog({
+            message: 'No objects could be identified. Please try again or upload another image.',
+          })
           return
         }
         this.imageObjectDetections$.next(response.detections)
@@ -157,10 +192,6 @@ export class AppComponent implements OnInit {
     ))
   }
 
-  /**
-   * Handle video file input change event triggered by user.
-   * @param fileInputEvent video file input change event
-   */
   private videoInputChange(uploadedVideoFile: File) {
     this.reset()
     this.cd.detectChanges()
@@ -190,9 +221,8 @@ export class AppComponent implements OnInit {
     ).subscribe(
       (response: FbnVideoRecognitionResponse) => {
         if (response.frames.length === 0) {
-          this.openDialog({
-            title: 'Error',
-            content: 'No objects could be identified. Please try again or try another image',
+          this.openErrorDialog({
+            message: 'No objects could be identified. Please try again or upload another video.',
           })
           return
         }
@@ -205,14 +235,19 @@ export class AppComponent implements OnInit {
    * Reset all data streams and cancel all pending http requests.
    */
   reset() {
+    // close all overlays
+    this.sideNav?.close()
+    this.showInfoOverlay = false
     // cancel all pending http requests
     this.requestSubscriptions$.forEach((subscription) => subscription.unsubscribe())
+    // reset all configs streams
     this.imageUrl$.next(undefined)
     this.videoUrl$.next(undefined)
     this.imageViewerConfig = undefined
     this.videoViewerConfig = undefined
     this.imageObjectDetections$.next([])
     this.videoObjectDetectionResponse$.next(undefined)
+    // apply changes
     this.cd.detectChanges()
   }
 
@@ -224,11 +259,9 @@ export class AppComponent implements OnInit {
     this.isDarkTheme = event.checked
   }
 
-  openInfoDialog() {
-    this.openDialog({
-      title: 'Info',
-      content: 'This application is for demoing object recognition in images and videos. Please upload an image of type JPG or MP4 to see the results. Maximum upload file size is 4MB.',
-    })
+  openInfo() {
+    this.sideNav?.close()
+    this.showInfoOverlay = true
   }
 
   /**
@@ -274,32 +307,31 @@ export class AppComponent implements OnInit {
   /**
    * Initialize video demo data.
    */
-  private initDemoVideo() {
+  initDemoVideo() {
     this.reset()
     this.isLoading$.next(true)
-    this.requestSubscriptions$.push(forkJoin([
+    forkJoin([
       this.getAssetByFileName('demo_data-video.mp4'),
       this.getAssetByFileName('demo_data-video_prediction.json'),
     ]).pipe(
       untilDestroyed(this),
       finalize(() => this.isLoading$.next(false)),
     ).subscribe(([videoData, jsonData]) => {
-      // cached video data
-      const videoUrl = URL.createObjectURL(videoData)
-      this.videoUrl$.next(videoUrl)
-      const videoInstance = document.createElement('video')
-      videoInstance.src = videoUrl
-      videoInstance.onloadeddata = () => {
-        this.videoInstance$.next(videoInstance)
-      }
+      // create File from Blob
+      const videoFile = new File([videoData], 'demo_data-video.mp4', { type: 'video/mp4' })
+      this.videoInputChange(videoFile)
+      // prevent default request to substitute with cached data
+      this.requestSubscriptions$.forEach((subscription) => subscription.unsubscribe())
       // cached json data
       const reader = new FileReader()
       reader.readAsText(jsonData)
       reader.onload = () => {
-        const demoData = JSON.parse(reader.result as string) as FbnVideoRecognitionResponse
-        this.videoObjectDetectionResponse$.next(demoData)
+        setTimeout(() => {
+          const demoData = JSON.parse(reader.result as string) as FbnVideoRecognitionResponse
+          this.videoObjectDetectionResponse$.next(demoData)
+        }, 1000)
       }
-    }))
+    })
   }
 
   /**

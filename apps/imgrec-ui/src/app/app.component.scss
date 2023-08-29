@@ -1,21 +1,28 @@
 @import '../styles/fbn-mixins';
 
-/* OUTER */
 
-.content {
-  min-height: 100%;
-  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+/* OUTER ********************************************************************* */
+
+.app-container {
+  height: 100vh;
+  overflow: hidden;
+  transition:
+    background-color 0.15s ease-in-out,
+    color 0.15s ease-in-out;
 }
 
 .wrapper {
   position: relative;
 }
 
-/* INNER */
+
+/* INNER ********************************************************************* */
+
+/* MAIN NAV BAR ************************************************************** */
 
 mat-toolbar {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   box-shadow: 0 0 1rem 0.1rem black;
 }
 
@@ -30,17 +37,89 @@ a.title {
   flex: 1 1 auto;
 }
 
+.button-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 .toolbar-section {
   display: flex;
   align-content: center;
   align-items: center;
-  margin-left: 2rem;
+  margin-left: 1rem;
   
-  & .__togge-container {
+  & .__toggle-container {
     display: flex;
     align-content: center;
     align-items: center;
     height: 60px;
     padding: 0 1rem;
+  }
+}
+
+
+/* SIDE NAV FOR MOBILE ******************************************************** */
+
+.sidenav-container {
+  /* overflow: hidden; */
+  height: calc(100vh - 64px);
+
+  & .sidenav-menu {
+    display: flex;
+    flex-direction: column;
+    padding: 0 1rem;
+    min-height: 100%;
+
+    & > * + * {
+      margin-top: 1rem;
+    }
+  }
+
+  & .sidenav-content {
+    display: flex;
+    flex-direction: column;
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .sidenav {
+    width: 100%;
+  }
+}
+
+
+/* INFO OVERLAY *************************************************************** */
+
+.info-overlay {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  & .--menu {
+    display: flex;
+    height: 3.5rem;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    width: calc(100% - 2rem);
+  }
+
+  & .--content {
+    max-width: var(--content-max-width);
+    overflow-y: auto;
+    padding-bottom: 5rem;
+    font-size: 120%;
+
+    & ul {
+      margin-top: 0;
+    }
   }
 }

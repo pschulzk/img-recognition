@@ -7,6 +7,7 @@ import { MatDialogModule } from '@angular/material/dialog'
 import { MatIconModule } from '@angular/material/icon'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
+import { MatSidenavModule } from '@angular/material/sidenav'
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { AppComponent } from './app.component'
@@ -27,6 +28,7 @@ import { ObjectViewerComponent } from './components/object-viewer/object-viewer.
     MatIconModule,
     MatProgressSpinnerModule,
     MatSlideToggleModule,
+    MatSidenavModule,
     MatToolbarModule,
     OverlayModule,
 

@@ -4,6 +4,8 @@
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 @import '@angular/cdk/overlay-prebuilt.css';
 
+/* GLOBAL VARIABLES *********************************************************** */
+
 @include mat.core();
 
 $fbn-primary: mat.define-palette(mat.$indigo-palette, 500);
@@ -17,11 +19,31 @@ $fbn-warn-color: mat.get-color-from-palette($fbn-warn, 400);
 :root {
   --fbn-primary-color: #5c6bc0;
   --fbn-warn-color: #f44336;
+  --content-max-width: 1024px;
 }
+@media (max-width: 767px) {
+  :root {
+    --content-max-width: 90%; // Adjust the value for smaller screens
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --content-max-width: 80%; // Adjust the value for medium-sized screens
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --content-max-width: 1024px; // Reset to the default value for larger screens
+  }
+}
+
+
+/* ANGULAR MATERIAL THEMING *************************************************** */
 
 $default-typography: mat.define-typography-config();
 
-/* DEFAULT THEME */
 $light-theme: mat.define-light-theme((
   color: (
     primary: $fbn-primary,
@@ -43,7 +65,10 @@ $dark-theme: mat.define-dark-theme((
 /* GLOBAL INCLUDES */
 @include mat.typography-hierarchy($default-typography);
 @include mat.all-component-themes($light-theme);
-@include mat.all-component-densities(-2);
+@include mat.all-component-densities(0);
+
+
+/* GLOBAL STYLES *************************************************************** */
 
 html, body {
   height: 100%;
@@ -55,7 +80,12 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-/* GLOBAL CLASSES */
+a {
+  color: inherit;
+}
+
+
+/* GLOBAL CLASSES ************************************************************** */
 
 .dark-theme {
   @include mat.all-component-colors($dark-theme);
