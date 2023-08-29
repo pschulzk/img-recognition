@@ -310,18 +310,22 @@ export class AppComponent implements OnInit {
   initDemoVideo() {
     this.reset()
     this.isLoading$.next(true)
-    forkJoin([
+    this.requestSubscriptions$.push(forkJoin([
       this.getAssetByFileName('demo_data-video.mp4'),
       this.getAssetByFileName('demo_data-video_prediction.json'),
     ]).pipe(
       untilDestroyed(this),
       finalize(() => this.isLoading$.next(false)),
     ).subscribe(([videoData, jsonData]) => {
-      // create File from Blob
-      const videoFile = new File([videoData], 'demo_data-video.mp4', { type: 'video/mp4' })
-      this.videoInputChange(videoFile)
-      // prevent default request to substitute with cached data
-      this.requestSubscriptions$.forEach((subscription) => subscription.unsubscribe())
+      // cached video data
+      const videoUrl = URL.createObjectURL(videoData)
+      this.videoUrl$.next(videoUrl)
+      const videoInstance = document.createElement('video')
+      videoInstance.src = videoUrl
+      videoInstance.onloadeddata = () => {
+        this.videoInstance$.next(videoInstance)
+        this.cd.detectChanges()
+      }
       // cached json data
       const reader = new FileReader()
       reader.readAsText(jsonData)
@@ -331,7 +335,7 @@ export class AppComponent implements OnInit {
           this.videoObjectDetectionResponse$.next(demoData)
         }, 1000)
       }
-    })
+    }))
   }
 
   /**
