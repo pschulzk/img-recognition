@@ -5,7 +5,7 @@
     #fileInput
     hidden="true"
     type="file"
-    accept="image/jpg, video/mp4"
+    [accept]="videoFunctionalityBrowserSupport ? 'image/jpg, video/mp4' : 'image/jpg'"
     (change)="fileInputChange($event)"
   />
   <button
@@ -110,7 +110,7 @@
           </fbn-image-viewer>
     
           <fbn-video-viewer
-            *ngIf="videoUrl$ | async"
+            *ngIf="videoFunctionalityBrowserSupport && (videoUrl$ | async)"
             [isLoading]="(isLoading$ | async) || false"
             [config]="videoViewerConfig"
           >

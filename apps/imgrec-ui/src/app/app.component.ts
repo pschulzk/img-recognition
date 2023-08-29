@@ -38,10 +38,9 @@ export class AppComponent implements OnInit {
   videoTrackingThreshold = 0
 
   showSideNav = false
-
   showInfoOverlay = false
-
   isDarkTheme = true
+  videoFunctionalityBrowserSupport = true
 
   private requestSubscriptions$: Subscription[] = []
 
@@ -54,6 +53,14 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    if (!('requestVideoFrameCallback' in HTMLVideoElement.prototype)) {
+      this.videoFunctionalityBrowserSupport = false
+      this.openErrorDialog({
+        message: 'Your browser does not support the required video features. Therefore, functionality is limited to uploading images only. This application is optimized for the Google Chrome browser.',
+      })
+      this.reset()
+    }
+
     // check if remote service is available
     this.objectDetectionService.getIsHealthy().pipe(
       untilDestroyed(this),
