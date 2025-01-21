@@ -6,6 +6,8 @@ import { UntilDestroy } from '@ngneat/until-destroy'
 import { FbnObjectFrameComponentData, ObjectFrameComponent } from '../object-frame/object-frame.component'
 import { ObjectViewerComponent } from '../object-viewer/object-viewer.component'
 
+const FBN_BOUNDING_BOX_PADDING = 5
+
 export interface VideoViewerConfig {
   /** base64 encoded image URL */
   videoUrl: string | undefined
@@ -195,11 +197,12 @@ export class VideoViewerComponent implements OnChanges {
     this.visualObjects.forEach((prevDetection, index) => {
       const existingDetection = nextDetections.find(nextDetection => nextDetection.id === prevDetection.id)
       if (existingDetection) {
+        const padding = FBN_BOUNDING_BOX_PADDING
         prevDetection.data = existingDetection
-        prevDetection.width = existingDetection.box.w * computedImageWidth
-        prevDetection.height = existingDetection.box.h * computedImageHeight
-        prevDetection.left = (existingDetection.box.x * computedImageWidth) - ((existingDetection.box.w * computedImageWidth) / 2)
-        prevDetection.bottom = computedImageHeight - ((existingDetection.box.y * computedImageHeight) + (existingDetection.box.h * computedImageHeight) / 2)
+        prevDetection.width = (existingDetection.box.w * computedImageWidth) + 2 * padding
+        prevDetection.height = (existingDetection.box.h * computedImageHeight) + 2 * padding
+        prevDetection.left = (existingDetection.box.x * computedImageWidth) - ((existingDetection.box.w * computedImageWidth) / 2) - padding
+        prevDetection.bottom = computedImageHeight - ((existingDetection.box.y * computedImageHeight) + (existingDetection.box.h * computedImageHeight) / 2) - padding
         prevDetection.opacity = existingDetection.confidence < 0.8 ? 0.4 : 1
       } else {
         // store indices of objects to remove
@@ -216,12 +219,13 @@ export class VideoViewerComponent implements OnChanges {
     nextDetections.forEach((nextDetection) => {
       const detectionExists = this.visualObjects.some(obj => obj.data.id === nextDetection.id)
       if (!detectionExists) {
+        const padding = FBN_BOUNDING_BOX_PADDING
         this.visualObjects.push({
           data: nextDetection,
-          width: nextDetection.box.w * computedImageWidth,
-          height: nextDetection.box.h * computedImageHeight,
-          left: (nextDetection.box.x * computedImageWidth) - ((nextDetection.box.w * computedImageWidth) / 2),
-          bottom: computedImageHeight - ((nextDetection.box.y * computedImageHeight) + (nextDetection.box.h * computedImageHeight) / 2),
+          width: (nextDetection.box.w * computedImageWidth) + 2 * padding,
+          height: (nextDetection.box.h * computedImageHeight) + 2 * padding,
+          left: (nextDetection.box.x * computedImageWidth) - ((nextDetection.box.w * computedImageWidth) / 2) - padding,
+          bottom: computedImageHeight - ((nextDetection.box.y * computedImageHeight) + (nextDetection.box.h * computedImageHeight) / 2) - padding,
           color: enabledObjectTracking ? ColorUtils.getRandomBrightColor(nextDetection.id): 'white',
           opacity: nextDetection.confidence < 0.8 ? 0.4 : 1,
           enlarged: false,

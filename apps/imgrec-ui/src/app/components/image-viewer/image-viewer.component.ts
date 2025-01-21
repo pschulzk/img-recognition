@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChange, ViewChild, ViewChildren } from '@angular/core'
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, QueryList, SimpleChange, ViewChild, ViewChildren } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { ColorUtils, FbnImageRecognitionDetection, rowCollapseAnimation } from '@fbn/fbn-imgrec'
 import { UntilDestroy } from '@ngneat/until-destroy'
@@ -79,7 +79,8 @@ export class ImageViewerComponent implements OnChanges {
           bottom: computedImageHeight - ((detection.box.y * computedImageHeight) + (detection.box.h * computedImageHeight) / 2),
           color: ColorUtils.getRandomBrightColor(),
           // if confidence is low than make less visible
-          opacity: detection.confidence < 0.8 ? 0.4 : 1,
+          // opacity: detection.confidence < 0.8 ? 0.4 : 1,
+          opacity: 1,
           enlarged: false,
           id: detection.id,
         }

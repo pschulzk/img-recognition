@@ -21,6 +21,7 @@
     class="img-overlay"
     [style.width.px]="config?.computedImageWidth"
     [style.height.px]="config?.computedImageHeight"
+    (click)="imageOverlayOnClicked()"
   >
     <!-- OBJECT FRAME -->
     <fbn-object-frame
@@ -33,8 +34,8 @@
       [computedImageHeight]="config?.computedImageHeight"
       (mouseover)="objectFrameOnMouseOver()"
       (mouseleave)="objectFrameOnMouseLeave()"
-      (click)="toggleEnlarge(objectData)"
     >
+      <!-- (click)="toggleEnlarge(objectData)" -->
     </fbn-object-frame>
   </div>
 </div>

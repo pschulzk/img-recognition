@@ -22,11 +22,11 @@
 .object-frame-container {
   position: absolute;
   transition: box-shadow 0.2s ease-in-out;
-  box-shadow: 0 0 2rem 0.25rem #000;
+  box-shadow: 0 0 1rem 0.5rem rgba(0, 0, 0, 0.5);
 
   &.--enlarged {
     opacity: 1 !important;
-    box-shadow: 0 0 2rem 1rem #000;
+    box-shadow: 0 0 2rem 1rem rgba(0, 0, 0, 0.5);
 
     & .__object-data {
       visibility: visible;
@@ -39,7 +39,7 @@
       z-index: 1;
       opacity: 1 !important;
       box-shadow: 0 0 3rem 1rem #000;
-      cursor: pointer;
+      /* cursor: pointer; */
       
       & .__object-data {
         visibility: visible;
@@ -55,16 +55,23 @@
 
 .object-frame {
   background-color: transparent;
-  box-shadow: 0 0 0 0.2rem;
+  /* box-shadow: 0 0 0 0.2rem; */
 
   & .__object-label {
+    box-shadow: 0 0 2rem 0.25rem #000;
     position: absolute;
-    bottom: 100%;
-    width: 100%;
-    left: -0.2rem;
-    padding: 0.2rem;
+    /* bottom: 0; */
+    top: 0;
+    /* width: 100%; */
+    /* max-width: 5rem; */
+    left: calc(100% + 0.4rem);
+    padding: 0 0.2rem;
     font-weight: bold;
     color: black;
+
+    /* & .__object-label-inner { */
+      /* padding: 0 0.2rem; */
+    /* } */
   }
 
   & .__object-canvas {
@@ -81,19 +88,18 @@
 
   & .__object-data {
     position: absolute;
-    top: 100%;
-    width: 100%;
-    left: -0.2rem;
-    padding: 0.2rem;
-  
+    bottom: 0;
+    width: content;
+    left: calc(100% + 0.4rem);
+    padding: 0 0.2rem;
+    
     visibility: hidden;
     opacity: 0;
     transition: visibility 0.2s ease-in-out, opacity 0.2s ease-in-out;
+    box-shadow: 0 0 2rem 0.25rem #000;
   
     color: black;
-    font-size: 0.9rem;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 }

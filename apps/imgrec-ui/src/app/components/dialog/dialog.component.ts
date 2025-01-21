@@ -7,9 +7,9 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 })
 export class DialogComponent {
 
-  title = ''
-  content = ''
-  isDarkTheme = true
+  // title = ''
+  // content = ''
+  // isDarkTheme = true
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: {
