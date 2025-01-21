@@ -68,18 +68,18 @@ export class AppComponent implements OnInit {
       this.reset()
     }
 
-    // check if remote service is available
-    this.objectDetectionService.getIsHealthy().pipe(
-      untilDestroyed(this),
-    ).subscribe((isHealthy) => {
-      if (!isHealthy) {
-        this.openDialog({
-          title: 'Error',
-          content: 'Remote service is currently not available. Please try again later.',
-        })
-      }
-      this.cd.detectChanges()
-    })
+    // // check if remote service is available
+    // this.objectDetectionService.getIsHealthy().pipe(
+    //   untilDestroyed(this),
+    // ).subscribe((isHealthy) => {
+    //   if (!isHealthy) {
+    //     this.openDialog({
+    //       title: 'Error',
+    //       content: 'Remote service is currently not available. Please try again later.',
+    //     })
+    //   }
+    //   this.cd.detectChanges()
+    // })
 
     // zip data streams to create image viewer config
     combineLatest([
@@ -220,6 +220,7 @@ export class AppComponent implements OnInit {
       finalize(() => this.isLoading$.next(false)),
     ).subscribe(
       (response: FbnVideoRecognitionResponse) => {
+      // () => {
         if (response.frames.length === 0) {
           this.openErrorDialog({
             message: 'No objects could be identified. Please try again or upload another video.',
@@ -311,14 +312,14 @@ export class AppComponent implements OnInit {
     this.reset()
     this.isLoading$.next(true)
     forkJoin([
-      this.getAssetByFileName('demo_data-video.mp4'),
-      this.getAssetByFileName('demo_data-video_prediction.json'),
+      this.getAssetByFileName('demo_data-video-3.mp4'),
+      this.getAssetByFileName('demo_data-video_prediction-3.json'),
     ]).pipe(
       untilDestroyed(this),
       finalize(() => this.isLoading$.next(false)),
     ).subscribe(([videoData, jsonData]) => {
       // create File from Blob
-      const videoFile = new File([videoData], 'demo_data-video.mp4', { type: 'video/mp4' })
+      const videoFile = new File([videoData], 'demo_data-video-3.mp4', { type: 'video/mp4' })
       this.videoInputChange(videoFile)
       // prevent default request to substitute with cached data
       this.requestSubscriptions$.forEach((subscription) => subscription.unsubscribe())
