@@ -210,26 +210,26 @@ export class AppComponent implements OnInit {
 
     // request video recognition meta  data
     this.isLoading$.next(true)
-    this.requestSubscriptions$.push(this.objectDetectionService.uploadVideo(uploadedVideoFile).pipe(
-      untilDestroyed(this),
-      switchMap((fileId: string) => this.objectDetectionService.getObjectDetectionForVideo(fileId, this.videoTrackingThreshold)),
-      catchError((error) => {
-        this.openErrorDialog(error)
-        return throwError(() => error)
-      }),
-      finalize(() => this.isLoading$.next(false)),
-    ).subscribe(
-      (response: FbnVideoRecognitionResponse) => {
-      // () => {
-        if (response.frames.length === 0) {
-          this.openErrorDialog({
-            message: 'No objects could be identified. Please try again or upload another video.',
-          })
-          return
-        }
-        this.videoObjectDetectionResponse$.next(response)
-      }
-    ))
+    // this.requestSubscriptions$.push(this.objectDetectionService.uploadVideo(uploadedVideoFile).pipe(
+    //   untilDestroyed(this),
+    //   switchMap((fileId: string) => this.objectDetectionService.getObjectDetectionForVideo(fileId, this.videoTrackingThreshold)),
+    //   catchError((error) => {
+    //     this.openErrorDialog(error)
+    //     return throwError(() => error)
+    //   }),
+    //   finalize(() => this.isLoading$.next(false)),
+    // ).subscribe(
+    //   (response: FbnVideoRecognitionResponse) => {
+    //   // () => {
+    //     if (response.frames.length === 0) {
+    //       this.openErrorDialog({
+    //         message: 'No objects could be identified. Please try again or upload another video.',
+    //       })
+    //       return
+    //     }
+    //     this.videoObjectDetectionResponse$.next(response)
+    //   }
+    // ))
   }
 
   /**
@@ -340,6 +340,6 @@ export class AppComponent implements OnInit {
    * @param fileName file name of asset
    */
   private getAssetByFileName(fileName: string): Observable<Blob> {
-    return this.http.get(`assets/${fileName}`, { responseType: 'blob' })
+    return this.http.get(`./assets/${fileName}`, { responseType: 'blob' })
   }
 }

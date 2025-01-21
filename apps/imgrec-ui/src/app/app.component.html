@@ -1,14 +1,14 @@
 <!-- MENU BUTTON TEMPLATE -->
 <ng-template #menuButtons>
   <!-- UPLOAD FILE -->
-  <input
+  <!-- <input
     #fileInput
     hidden="true"
     type="file"
     [accept]="videoFunctionalityBrowserSupport ? 'image/jpg, video/mp4' : 'image/jpg'"
     (change)="fileInputChange($event)"
-  />
-  <button
+  /> -->
+  <!-- <button
     mat-raised-button
     color="primary"
     title="Let AI perform Object Detection on your uploaded JPG or MP4 file"
@@ -16,10 +16,10 @@
   >
     <mat-icon>upload</mat-icon>
     Upload file for Object Detection
-  </button>
+  </button> -->
 
   <!-- RESTART -->
-  <button
+  <!-- <button
     mat-raised-button
     color="primary"
     aria-label="Redo"
@@ -27,10 +27,10 @@
   >
     <mat-icon>play_arrow_outlined</mat-icon>
     Restart demo
-  </button>
+  </button> -->
 
   <!-- EMPTY -->
-  <button
+  <!-- <button
     mat-raised-button
     color="primary"
     aria-label="Redo"
@@ -38,7 +38,7 @@
   >
     <mat-icon>close</mat-icon>
     Empty View
-  </button>
+  </button> -->
 
   <!-- HELP -->
   <button
@@ -51,7 +51,7 @@
   </button>
 
   <!-- TOGGLE DARK MODE -->
-  <section class="toolbar-section">
+  <!-- <section class="toolbar-section">
     <mat-icon>light_mode</mat-icon>
     <div class="__toggle-container">
       <mat-slide-toggle
@@ -61,7 +61,7 @@
       </mat-slide-toggle>
     </div>
     <mat-icon>bedtime</mat-icon>
-  </section>
+  </section> -->
 </ng-template>
 
 <!-- APP COMPONENT -->
@@ -81,7 +81,7 @@
       class="title"
       href="/"
     >
-      Object Detection
+      Demo: Browser-basierte Live-Objekterkennung
     </a>
     
     <span class="spacer"></span>
@@ -156,26 +156,26 @@
           <div class="--content">
             <h1>Demo Application for Machine Learning-based Object Detection</h1>
             
-            <h2>How to use</h2>
+            <!-- <h2>How to use</h2>
             <p>
               Upload a JPG or MP4 file to have Object Detection performed on it.
               The AI will draw bounding boxes around the detected objects. Clicking or tapping on a bounding box will show enlarge the detected object.
             </p>
-            <br>
+            <br> -->
             
-            <h2>Disclamer</h2>
+            <h2>Disclaimer</h2>
             <p>
               This is a demo application for demonstration and educational purposes only. It is not intended for production use or any real-world application.
               The authors do not take any responsibility for the correctness of the results or any other damages caused by the use of this application.
             </p>
             <br>
     
-            <h2>Uploaded data</h2>
+            <!-- <h2>Uploaded data</h2>
             <p>
               Files uploaded are not processed in any other way except for the purposes of this app.
               Image files are not stored on the server and are only processed in the browser.
               Video files are stored on the server for the duration of the processing and are deleted afterwards.
-            </p>
+            </p> -->
             
             <h2>Authors</h2>
             <ul>
